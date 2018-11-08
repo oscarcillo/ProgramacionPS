@@ -1,6 +1,6 @@
 package P01_Procesos_Java;
 
-public class lanzadorProceso {
+public class E02_lanzadorProceso {
 
 	public void ejecutar(String ruta){
 
@@ -24,7 +24,7 @@ public class lanzadorProceso {
 	        String ruta = 
 	        "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe";
 	        
-	        lanzadorProceso lp=new lanzadorProceso();
+	        E02_lanzadorProceso lp=new E02_lanzadorProceso();
 	        lp.ejecutar(ruta);
 	        System.out.println("Finalizado");
 	}

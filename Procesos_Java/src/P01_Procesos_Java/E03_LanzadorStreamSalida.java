@@ -2,7 +2,7 @@ package P01_Procesos_Java;
 
 import java.io.InputStream;
 
-public class LanzadorStreamSalida {
+public class E03_LanzadorStreamSalida {
 
 	public void lanzarSumador(Integer n1, Integer n2){
 	    String clase="com.creacion.Sumador";
@@ -51,7 +51,7 @@ public class LanzadorStreamSalida {
 	}
 	
 	public static void main(String[] args){
-	    LanzadorStreamSalida l=new LanzadorStreamSalida();
+	    E03_LanzadorStreamSalida l=new E03_LanzadorStreamSalida();
 	    l.lanzarSumador(1, 51);
 	    l.lanzarSumador(51, 100);
 	    System.out.println("Sumas realizadas con �xito");

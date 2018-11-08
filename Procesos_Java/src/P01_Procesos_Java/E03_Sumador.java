@@ -1,10 +1,10 @@
 package P01_Procesos_Java;
 
-public class Sumador {
+public class E03_Sumador {
 	/**
-	 * Método que suma todos los números entre dos valores
-	 * @param n1 Número por el que va a empezar a sumar
-	 * @param n2 Número con el que va a terminar de sumar
+	 * Mï¿½todo que suma todos los nï¿½meros entre dos valores
+	 * @param n1 Nï¿½mero por el que va a empezar a sumar
+	 * @param n2 Nï¿½mero con el que va a terminar de sumar
 	 * @return Integer Devuelve el resultado de la suma
 	 */
     public int sumar(int n1, int n2)
@@ -22,9 +22,9 @@ public class Sumador {
     
     public static void main(String[] args)
     {
-            Sumador s = new Sumador();
+            E03_Sumador s = new E03_Sumador();
             
-            //le pasamos los valores por argumentos al método main
+            //le pasamos los valores por argumentos al mï¿½todo main
             int n1 = Integer.parseInt(args[0]); 
             int n2 = Integer.parseInt(args[1]);
             

@@ -1,12 +1,12 @@
 /**
  * Process & ProcessBuilder
- * Ejecutar una aplicación del S.O.
+ * Ejecutar una aplicaciï¿½n del S.O.
  */
 package P01_Procesos_Java;
 
 import java.io.IOException;
 
-public class ejecutarApp {
+public class E01_ejecutarApp {
 
 	/**
 	 * @param args

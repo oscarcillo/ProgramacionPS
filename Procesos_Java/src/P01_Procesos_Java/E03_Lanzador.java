@@ -1,6 +1,6 @@
 package P01_Procesos_Java;
 
-public class Lanzador {
+public class E03_Lanzador {
 
 	public void lanzarSumador(Integer n1, Integer n2)
 	{
@@ -20,12 +20,12 @@ public class Lanzador {
 	
 	public static void main(String[] args)
 	{
-	    Lanzador l=new Lanzador();
+	    E03_Lanzador l=new E03_Lanzador();
 	    
 	    l.lanzarSumador(1, 51);
 	    l.lanzarSumador(51, 100);
 	    
-	    System.out.println("Sumas realizadas con éxito");
+	    System.out.println("Sumas realizadas con ï¿½xito");
 	}
 
 }
