@@ -63,17 +63,9 @@ public class A01_procesos_ejecutar {
 	public static void main(String[] args) 
 	{
 		
-		String [] array = new String[1];
-			array[0] = "-1";
-		
 		 A01_procesos_ejecutar lanzador = new A01_procesos_ejecutar();
-		 lanzador.ejecutar(array);
-		 
-		 	array[0] = "hola";
-		 
-		 lanzador.ejecutar(array);
-		 
-
+		 lanzador.ejecutar(args);		 
+		
 	}
 
 }

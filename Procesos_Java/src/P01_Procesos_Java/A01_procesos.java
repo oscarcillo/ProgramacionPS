@@ -2,7 +2,7 @@ package P01_Procesos_Java;
 
 public class A01_procesos {
 
-	public static void main(String[] args) 
+	public static void salida(String[] args) 
 	{
 		
 		//comprueba que el numero de argumentos es menor a 1
