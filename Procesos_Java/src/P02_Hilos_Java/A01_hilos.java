@@ -39,6 +39,5 @@ public class A01_hilos extends Thread {
 		
 		
 	}// main
-	
 
 }

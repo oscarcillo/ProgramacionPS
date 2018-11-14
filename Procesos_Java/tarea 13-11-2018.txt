@@ -1,0 +1,6 @@
+Issue (Repositorio alumno)
+
+	-Asignar al usuario @franlu
+	-Enlace al commit que contiene el codigo de cada actividad
+	-Comentario sobre la tarea (opcional)
+	-Fecha fin viernes 16
