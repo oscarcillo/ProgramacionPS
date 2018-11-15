@@ -30,7 +30,7 @@ public class E07_HiloAppletBotones extends Applet implements Runnable, ActionLis
 		Thread hiloActual = Thread.currentThread();
 		while (h == hiloActual && !parar) {
 			try {
-				Thread.sleep(500);
+				Thread.sleep(1);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
