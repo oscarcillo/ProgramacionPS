@@ -8,7 +8,6 @@ import java.io.IOException;
 public class A03_LeerFicherosSecuencial {
 	
 	static String ruta;
-	static int caracter;
 	static long t_inicio, t_fin;
 	static int n_caracteres;
 
@@ -26,7 +25,7 @@ public class A03_LeerFicherosSecuencial {
 			File f = new File(ruta);
 			FileReader fileReader = new FileReader(f);
 			
-			while((caracter=fileReader.read())!=-1)//while para leer el fichero
+			while(fileReader.read()!=-1)//while para leer el fichero
 			{
 					n_caracteres++;
 			}
