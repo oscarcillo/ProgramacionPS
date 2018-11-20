@@ -46,6 +46,10 @@ public class A03_LeerFicherosHilos implements Runnable{
 			ruta = "src\\P02_Hilos_Java\\ficheros\\fichero" + i + ".txt";
 			Thread t = new Thread(h);
 			t.start();
+			
+			while(t.getState() != Thread.State.TERMINATED)
+			{
+			}
 		}
 		
 		t_fin = System.currentTimeMillis();
