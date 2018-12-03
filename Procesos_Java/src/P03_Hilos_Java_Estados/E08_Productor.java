@@ -11,10 +11,17 @@ public class E08_Productor extends Thread {
 
     public void run() {
         int valor = 0;
-        for (int i = 0; i < 5; i++) {
-            valor = cola.get(); //recoge el número
-            System.out.println(i + "=>Consumidor: " + n
-                               + ", consume: " + valor);
+
+        synchronized (cola) {
+    	  for (int i = 0; i < 5; i++) {
+              valor = cola.get(); //recoge el número
+              System.out.println(i + "=>Consumidor: " + n
+                                 + ", consume: " + valor);
+              cola.notify();
+              try {
+					cola.wait();//esperar a que llegue un notify 
+				 } catch (InterruptedException e) {}		
+          }
         }
     }
 }
