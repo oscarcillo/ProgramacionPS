@@ -36,6 +36,7 @@ public class Productor extends Thread {
      			}
      			
      			fr.close();
+     			System.out.println("El productor ha finalizado");
              	
              }catch(IOException e) {} catch (InterruptedException e) {
 				e.printStackTrace();
