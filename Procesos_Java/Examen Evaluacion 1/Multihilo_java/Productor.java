@@ -19,20 +19,29 @@ public class Productor extends Thread {
         File f = new File(ruta);
         FileReader fr;
         int i;
+        int contador = 0;
         
-        try {
-        	fr = new FileReader(f);
-            
-		    while((i=fr.read())!=-1)//while para leer el fichero
-			{
-		    	char car = (char)i;
-				cola.put(car);
-				System.out.println("El productor produce " + car);
-			}
-			
-			fr.close();
+        synchronized(cola){
         	
-        }catch(IOException e) {} 
+        	 try {
+             	fr = new FileReader(f);
+                 
+     		    while((i=fr.read())!=-1)//while para leer el fichero
+     			{
+     		    	char car = (char)i;
+     				cola.put(car);
+     				System.out.println(contador++ + "El productor produce " + car);
+     				cola.notify();
+     				cola.wait();
+     			}
+     			
+     			fr.close();
+             	
+             }catch(IOException e) {} catch (InterruptedException e) {
+				e.printStackTrace();
+			} 
+        	
+        }
 
     }
 }

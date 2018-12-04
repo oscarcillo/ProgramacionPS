@@ -2,18 +2,29 @@ package Multihilo_java;
 
 public class Consumidor extends Thread {
     private Cola cola;
-    private int n;
 
-    public Consumidor(Cola c, int n) {
+    public Consumidor(Cola c) {
         cola = c;
-        this.n = n;
     }
 
     public void run() {
         char valor;
-        for (int i = 0; i < 5; i++) {
-            valor = cola.get(); //recoge el número
-            System.out.println(i+" - El consumidor consume " + valor);
-        }
+        
+        synchronized(cola) {
+        	
+        	for (int i = 0; i < 7; i++) {
+        		
+        		try {
+					cola.wait();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+        		
+                valor = (char)cola.get(); //recoge el número
+                System.out.println(i+" - El consumidor consume " + valor);
+                cola.notify();
+            }
+        }  
     }
 }
