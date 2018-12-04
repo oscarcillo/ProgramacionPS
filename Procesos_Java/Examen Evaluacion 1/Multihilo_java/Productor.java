@@ -21,16 +21,18 @@ public class Productor extends Thread {
         int i;
         
         try {
-        	
         	fr = new FileReader(f);
             
 		    while((i=fr.read())!=-1)//while para leer el fichero
 			{
-					System.out.print((char)i);
+		    	char car = (char)i;
+				cola.put(car);
+				System.out.println("El productor produce " + car);
 			}
 			
 			fr.close();
         	
         }catch(IOException e) {} 
+
     }
 }

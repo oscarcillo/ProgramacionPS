@@ -10,14 +10,10 @@ public class Consumidor extends Thread {
     }
 
     public void run() {
+        char valor;
         for (int i = 0; i < 5; i++) {
-            cola.put(i); //pone el n�mero
-            System.out.println(i + "=>Productor : " + n
-                               + ", produce: " + i);
-            try {
-                sleep(100);
-            } catch (InterruptedException e) { }			
-			
+            valor = cola.get(); //recoge el número
+            System.out.println(i+" - El consumidor consume " + valor);
         }
     }
 }

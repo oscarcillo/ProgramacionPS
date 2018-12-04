@@ -6,7 +6,7 @@ public class Ejecutar_LeerCadenas {
 
 	public void ejecutar(String cadena)
 	{
-		String clase = "/ProgramacionServiciosProcesos/Examen Evaluacion 1";
+		String clase = "com.Ejercicios_multiproceso.LeerCadenas";
 		Process proceso;
 		
 		try
