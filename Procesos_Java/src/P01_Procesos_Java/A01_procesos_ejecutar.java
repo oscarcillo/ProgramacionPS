@@ -12,11 +12,7 @@ public class A01_procesos_ejecutar {
 		
 		try
 		{
-			proceso = new ProcessBuilder(
-                    	  "java",
-                    	  clase,
-                    	  argumentos[0]
-					      ).start();
+			proceso = new ProcessBuilder("java", clase).start();
 			
 			try
 			{
