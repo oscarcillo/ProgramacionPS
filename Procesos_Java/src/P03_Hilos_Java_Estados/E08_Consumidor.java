@@ -10,14 +10,17 @@ public class E08_Consumidor extends Thread {
     }
 
     public void run() {
-        for (int i = 0; i < 5; i++) {
-            cola.put(i); //pone el n�mero
-            System.out.println(i + "=>Productor : " + n
-                               + ", produce: " + i);
-            try {
-                sleep(100);
-            } catch (InterruptedException e) { }			
-			
-        }
+    	
+    	synchronized(cola){
+    		 for (int i = 0; i < 5; i++) {
+    	            cola.put(i); //pone el n�mero
+    	            System.out.println(i + "=>Productor : " + n
+    	                               + ", produce: " + i);
+    	            cola.notify();
+    	          	try {
+						cola.wait();
+					} catch (InterruptedException e) {}
+    	        }
+    	}
     }
 }

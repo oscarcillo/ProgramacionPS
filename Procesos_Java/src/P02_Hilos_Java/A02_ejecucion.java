@@ -1,6 +1,6 @@
 package P02_Hilos_Java;
 
-public class A02_ejecución {
+public class A02_ejecucion{
 
 	public static void main(String[] args) {
 
