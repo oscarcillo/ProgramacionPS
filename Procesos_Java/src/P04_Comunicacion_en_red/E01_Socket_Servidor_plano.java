@@ -27,10 +27,6 @@ public class E01_Socket_Servidor_plano{
 		System.out.println(serversocket.getLocalPort());
 		Socket socketcliente = serversocket.accept();
 		
-		//cerramos el socket servidor
-		serversocket.close();
-		System.out.println("Socket servidor cerrado");
-		
 		//Creamos InputStream para recibir datos del socket cliente
 		//y leemos el texto que tiene
 		InputStream is = socketcliente.getInputStream();
@@ -41,5 +37,6 @@ public class E01_Socket_Servidor_plano{
 		System.out.println("Texto recibido: " + texto);
 		
 		socketcliente.close();
+		serversocket.close();
 	}
 }

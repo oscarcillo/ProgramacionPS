@@ -23,8 +23,9 @@ public class E01_Socket_Cliente {
 		OutputStream os;
 		
 		try {
-			//creación del socket
-			Socket socket = new Socket(InetAddress.getLocalHost(), 9999);
+			//creación del socket y conexion 
+			Socket socket = new Socket();
+			socket.connect(new InetSocketAddress(InetAddress.getLocalHost(), 9999));
 			
 			//insertar un stream al socket
 			os = socket.getOutputStream();
@@ -32,9 +33,7 @@ public class E01_Socket_Cliente {
 				System.out.println(i);
 				os.write(i);
 			}
-			//conectarse con otro socket
-			socket.connect(new InetSocketAddress(InetAddress.getLocalHost(), 9999));
-			//
+			socket.close();
 		}catch(Exception e) {
 			System.out.println(e);
 		}	
