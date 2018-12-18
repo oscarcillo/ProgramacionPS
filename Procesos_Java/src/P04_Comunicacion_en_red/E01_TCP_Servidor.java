@@ -1,4 +1,5 @@
 package P04_Comunicacion_en_red;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -14,11 +15,12 @@ import java.util.Scanner;
  * @author ifc
  *
  */
-public class E01_Socket_Servidor_plano{
+public class E01_TCP_Servidor{
 	
 	static Scanner teclado;
 
 	public static void main(String[] args) throws IOException {
+		
 		int numeroPuerto = 6000;// Puerto
 		ServerSocket servidor = new ServerSocket(numeroPuerto);
 		Socket clienteConectado = null;
