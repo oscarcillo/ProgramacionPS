@@ -5,7 +5,7 @@ import java.io.InputStream;
 //libreria de java para comunicación en red
 import java.net.*;
 
-public class Main {
+public class MainEjemplo {
 
 	public static void main(String[] args) throws IOException {
 
