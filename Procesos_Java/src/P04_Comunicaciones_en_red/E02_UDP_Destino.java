@@ -1,14 +1,16 @@
+package P04_Comunicaciones_en_red;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
-public class E02_UDP_Destino_plano {
+public class E02_UDP_Destino {
 
 	public static void main(String[] args) throws IOException {
 		
 		byte[] bufer = new byte[1024];
-		DatagramSocket socket = new DatagramSocket(6543);   
+		DatagramSocket socket = new DatagramSocket(9999);   
 
 		//ESPERANDO DATAGRAMA
 		System.out.println("Esperando Datagrama .......... ");  

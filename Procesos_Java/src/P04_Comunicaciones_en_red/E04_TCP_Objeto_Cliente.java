@@ -1,4 +1,4 @@
-package P04_Comunicacion_en_red;
+package P04_Comunicaciones_en_red;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
