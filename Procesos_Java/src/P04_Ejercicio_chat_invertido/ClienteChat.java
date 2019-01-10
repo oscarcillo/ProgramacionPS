@@ -1,4 +1,4 @@
-package P04_Ejemplo_chat_sockets;
+package P04_Ejercicio_chat_invertido;
 
 import java.awt.event.*;
 import java.io.*;
@@ -109,7 +109,7 @@ public class ClienteChat extends JFrame implements ActionListener, Runnable {
 	}// run
 
 	public static void main(String args[]) {
-		int puerto = 44444;
+		int puerto = 54321;
 		Socket s = null;
 
 		String nombre = JOptionPane.showInputDialog("Introduce tu nombre o nick:");
@@ -120,7 +120,7 @@ public class ClienteChat extends JFrame implements ActionListener, Runnable {
 		}
 
 		try {
-			s = new Socket("192.168.4.139", puerto);
+			s = new Socket("localhost", puerto);
 			ClienteChat cliente = new ClienteChat(s, nombre);
 			cliente.setBounds(0, 0, 540, 400);
 			cliente.setVisible(true);
