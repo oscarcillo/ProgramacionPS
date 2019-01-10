@@ -1,14 +1,18 @@
 package P04_Ejercicio_chat_invertido;
 
+import java.awt.RenderingHints.Key;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
+import java.util.EventListener;
+
 import javax.swing.*;
 
 public class ClienteChat extends JFrame implements ActionListener, Runnable {
 	
 	private static final long serialVersionUID = 1L;
 	Socket socket = null;
+	InetAddress ip = InetAddress.getLocalHost();
 	// streams
 	DataInputStream fentrada;
 	DataOutputStream fsalida;
@@ -22,16 +26,16 @@ public class ClienteChat extends JFrame implements ActionListener, Runnable {
 	boolean repetir = true;
 
 	// constructor
-	public ClienteChat(Socket s, String nombre) {
+	public ClienteChat(Socket s, String nombre) throws UnknownHostException {
 		super(" CONEXI�N DEL CLIENTE CHAT: " + nombre);
 		setLayout(null);
 
-		mensaje.setBounds(10, 10, 400, 30);
+		mensaje.setBounds(10, 320, 400, 30);
 		add(mensaje);
 
 		textarea1 = new JTextArea();
 		scrollpane1 = new JScrollPane(textarea1);
-		scrollpane1.setBounds(10, 50, 400, 300);
+		scrollpane1.setBounds(10, 10, 400, 300);
 		add(scrollpane1);
 
 		botonEnviar.setBounds(420, 10, 100, 30);
@@ -45,11 +49,12 @@ public class ClienteChat extends JFrame implements ActionListener, Runnable {
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
 		socket = s;
+		nombre = nombre + " (" + ip.getHostAddress() + ")"; 
 		this.nombre = nombre;
 		try {
 			fentrada = new DataInputStream(socket.getInputStream());
 			fsalida = new DataOutputStream(socket.getOutputStream());
-			String texto = " > Entra en el Chat ... " + nombre;
+			String texto = "> Entra en el Chat ... " + nombre;
 			fsalida.writeUTF(texto);
 		} catch (IOException e) {
 			System.out.println("ERROR DE E/S");
@@ -74,7 +79,7 @@ public class ClienteChat extends JFrame implements ActionListener, Runnable {
 			}
 		}
 		if (e.getSource() == botonSalir) { // SE PULSA BOTON SALIR
-			String texto = " > Abandona el Chat ... " + nombre;
+			String texto = "> Abandona el Chat ... " + nombre;
 			try {
 				fsalida.writeUTF(texto);
 				fsalida.writeUTF("*");
@@ -94,8 +99,8 @@ public class ClienteChat extends JFrame implements ActionListener, Runnable {
 
 			} catch (IOException e) {
 				// este error sale cuando el servidor se cierra
-				JOptionPane.showMessageDialog(null, "IMPOSIBLE CONECTAR CON EL SERVIDOR\n" + e.getMessage(),
-						"<<MENSAJE DE ERROR:2>>", JOptionPane.ERROR_MESSAGE);
+				//JOptionPane.showMessageDialog(null, "IMPOSIBLE CONECTAR CON EL SERVIDOR\n" + e.getMessage(),
+						//"<<MENSAJE DE ERROR:2>>", JOptionPane.ERROR_MESSAGE);
 				repetir = false;
 			}
 		} // while

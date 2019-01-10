@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.*;
 
 public class HiloServidorChat implements Runnable {
+	
 	DataInputStream fentrada;
 	Socket socket = null;
 	ComunHilos comun;
@@ -31,14 +32,14 @@ public class HiloServidorChat implements Runnable {
 			String cadena = "";
 			try {
 				cadena = fentrada.readUTF();
-				if (cadena.trim().equals("*")) {// EL CLIENTE SE DESCONECTA
+				if (comprobarAdios(cadena)) {// EL CLIENTE SE DESCONECTA
 					comun.setACTUALES(comun.getACTUALES() - 1);
 					System.out.println("NUMERO DE CONEXIONES ACTUALES: " + comun.getACTUALES());
 					break;
 				}
 				//dar la vuelta a la cadena
-				
-				cadena = voltearCadena(cadena);
+				if(cadena.charAt(0)!='>')
+					cadena = voltearCadena(cadena);
 				//
 				comun.setMensajes(comun.getMensajes() + cadena + "\n");
 				EnviarMensajesaTodos(comun.getMensajes());
@@ -76,16 +77,28 @@ public class HiloServidorChat implements Runnable {
 	}// EnviarMensajesaTodos
 	
 	private String voltearCadena(String cadena) {
-		
 		String [] array;
 		array = cadena.split(">");
+		String cadenacambiar = "";
 		String cadenavolteada = "";
 		
-		char invertida[] = array[1].toCharArray();	
+		for(int i = 1; i < array.length; i++)
+			cadenacambiar = cadenacambiar + array[i];
+		
+		char invertida[] = cadenacambiar.toCharArray();	
 		for (int i=invertida.length-1;i>=0;i--) {
 			cadenavolteada = cadenavolteada + invertida[i];
 		}
-		return array[0] + " >" + cadenavolteada;
+		return array[0] + " > " + cadenavolteada;
+	}
+	
+	private boolean comprobarAdios(String cadena) {
+		String [] array;
+		array = cadena.split(">");
+		if(array[array.length-1].trim().equals("adios"))
+			return true;
+		else
+			return false;
 	}
 
 }// ..HiloServidorChat
