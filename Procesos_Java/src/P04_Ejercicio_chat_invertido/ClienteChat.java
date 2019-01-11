@@ -38,9 +38,9 @@ public class ClienteChat extends JFrame implements ActionListener, Runnable {
 		scrollpane1.setBounds(10, 10, 400, 300);
 		add(scrollpane1);
 
-		botonEnviar.setBounds(420, 10, 100, 30);
+		botonEnviar.setBounds(420, 320, 100, 30);
 		add(botonEnviar);
-		botonSalir.setBounds(420, 50, 100, 30);
+		botonSalir.setBounds(420, 280, 100, 30);
 		add(botonSalir);
 
 		textarea1.setEditable(false);
