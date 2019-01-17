@@ -44,19 +44,22 @@ public class E04_DescargarFicheroFTP {
 		//RECUPERAR EL FICHERO
 		String nombreFichero = "";
 		BufferedOutputStream out = null;
-		
+		//recorre la lista de archivos
 		for(int i = 0; i < files.length; i++) {
+			//si es un fichero, los descarga con el BufferedOutputStream
 			if(files[i].getType()==0) {
 				nombreFichero = files[i].getName();
-				out = new BufferedOutputStream(
-						new FileOutputStream("src\\P05_Generacion_Servicios_Red\\ficheros\\"+nombreFichero));
+				out = new BufferedOutputStream(new FileOutputStream(
+						"src\\P05_Generacion_Servicios_Red\\ficheros\\"+nombreFichero));
 				cliente.retrieveFile(nombreFichero, out);
 				System.out.println("El fichero "+nombreFichero+" ha sido descargado");
 			}
 		}
 		out.close();
+		//CAMBIAR DE DIRECTORIO
+		cliente.changeWorkingDirectory("/carpeta1");
+		System.out.println("Cambio de directorio a "+cliente.printWorkingDirectory());
 		//
-		
 		boolean logout = cliente.logout();
 		if (logout) 
 			System.out.println("Logout del servidor FTP...");
