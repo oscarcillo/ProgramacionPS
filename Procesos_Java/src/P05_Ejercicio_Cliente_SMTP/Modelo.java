@@ -1,4 +1,4 @@
-package P05_Generacion_Servicios_Red;
+package P05_Ejercicio_Cliente_SMTP;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -11,9 +11,30 @@ import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import org.apache.commons.net.smtp.*;
 
-public class E09_EnvioCorreoAutenticacion {
+public class Modelo {
 	
-	public static void main(String[] args) throws NoSuchAlgorithmException,
+	private String server;
+	private String username;
+	private String password;
+	private String remitente;
+	private String destino1;
+	private String cc;
+	private String asunto;
+	private String mensaje;
+	
+	public Modelo(String server, String username, String password, String remitente, String destino1, 
+			String cc, String asunto, String mensaje) {
+		this.server = server;
+		this.username = username;
+		this.password = password;
+		this.remitente = remitente;
+		this.destino1 = destino1;
+		this.cc = cc;
+		this.asunto = asunto;
+		this.mensaje = mensaje;
+	}
+	
+	public void enviarCorreo() throws NoSuchAlgorithmException,
 		UnrecoverableKeyException, KeyStoreException, InvalidKeyException, 
 		InvalidKeySpecException {
 
@@ -21,11 +42,7 @@ public class E09_EnvioCorreoAutenticacion {
 		AuthenticatingSMTPClient client = new AuthenticatingSMTPClient();
 
 		// datos del usuario y del servidor
-		String server = "smtp.gmail.com";
-		String username = "";
-		String password = "";
 		int puerto = 587;
-		String remitente = "oscar.tutor.rubio@iestubalcain.net";
 
 		try {
 			int respuesta;
@@ -63,9 +80,9 @@ public class E09_EnvioCorreoAutenticacion {
 				// se realiza la autenticaci�n con el servidor
 				if (client.auth(AuthenticatingSMTPClient.AUTH_METHOD.LOGIN, username, password)) {
 					System.out.println("4 - " + client.getReplyString());
-					String destino1 = "fulanito@gmail.com";
-					String asunto = "Prueba de SMTPClient con Gmail";
-					String mensaje = "Esto es una prueba de mensaje con usuario autenticado desde Java.";
+					destino1 = "fulanito@gmail.com";
+					asunto = "Prueba de SMTPClient con Gmail";
+					mensaje = "Esto es una prueba de mensaje con usuario autenticado desde Java.";
 					// se crea la cabecera
 					SimpleSMTPHeader cabecera = new SimpleSMTPHeader(remitente, destino1, asunto);
 
