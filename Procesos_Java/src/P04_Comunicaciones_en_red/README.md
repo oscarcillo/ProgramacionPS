@@ -141,20 +141,330 @@ String paquete= new String(recibo.getData());//obtengo String
 System.out.println("Número de Bytes recibidos: "+ bytesRec);    
 System.out.println("Contenido del Paquete    : "+ paquete.trim());
 System.out.println("Puerto origen del mensaje: "+ recibo.getPort());
-System.out.println("IP de origen             : "+
-                             recibo.getAddress().getHostAddress());   
-System.out.println("Puerto destino del mensaje:" + 
-                             socket.getLocalPort());	
+System.out.println("IP de origen             : "+ recibo.getAddress().getHostAddress());   
+System.out.println("Puerto destino del mensaje:" + socket.getLocalPort());	
 socket.close(); //cierro el socket
+```
 
-````
+### Socket Multicast
+
+Mediante la clase [*MulticastSocket*](https://docs.oracle.com/javase/7/docs/api/java/net/MulticastSocket.html) es posible enviar paquetes a varios destinatarios de forma simultánea. Para ello es necesario establecer en primer lugar el grupo de destinatarios, es decir, distintas direcciones ip pero con el mismo puerto. Dado que la creación del grupo de destinatarios es independiente del mensaje, puede decirse que los destinatarios son transparentes para el emisor (no conoce cuántos son ni sus direcciones).
+
+Para definir el grupo multicast se utiliza una [dirección IP](https://es.wikipedia.org/wiki/Dirección_IP) de la clase D y un puerto UDP. El rango de las direcciones IP de clase D abarca de la 224.0.0.0 a la 239.255.255.255, si bien la primera no debe utilizarse.
+
+Como ya se ha visto para definir los sockets UDP la misma clase que modela el objeto que envía el socket, modela el que los recibe. Vemos un ejemplo:
+
+```java
+public class MulticastEmisor {
+    private DatagramSocket socket;
+    private InetAddress grupo;
+    private byte[] buf;
+ 
+    public void multicast(
+      String multicastMessage) throws IOException {
+        socket = new DatagramSocket();
+        grupo = InetAddress.getByName("230.0.0.0");
+        buf = multicastMessage.getBytes();
+ 
+        DatagramPacket informacion = new DatagramPacket(buf, buf.length, grupo, 4446);
+        socket.send(informacion);
+        socket.close();
+    }
+}
+
+// Cliente que escucha hasta que llega la cadena fin.
+public class MulticastReceptor extends Thread {
+    protected MulticastSocket socket = null;
+    protected byte[] buf = new byte[256];
+ 
+    public void run() {
+        
+        socket = new MulticastSocket(4446);
+        InetAddress grupoMulticast = InetAddress.getByName("230.0.0.0");
+        socket.joinGroup(grupoMulticast);
+        
+        while (true) {
+            
+            DatagramPacket informacion = new DatagramPacket(buf, buf.length);
+            socket.receive(informacion);
+            String recibido = new String(informacion.getData(), 0, informacion.getLength());
+            System.out.println(recibido);
+            
+            if ("fin".equals(recibido)) {
+                break;
+            }
+        }
+        socket.leaveGroup(grupoMulticast);
+        socket.close();
+    }
+}
+```
+Como se ve el proceso es bastante sencillo, implica los siguientes pasos por parte del emisor:
+
+1. Creación del socket y grupo (señalar la IP multicast a utilizar).
+2. Construir el mensaje
+3. Envío
+4. Cierre del socket.
+
+Por su parte el receptor debe:
+
+1. Crear el socket y unirse al grupo multicast
+2. Escuchar los mensajes
+3. Abandonar el grupo si se desea
+4. Cierre del socket.
+
+## Envío de objetos mediante sockets
+
+A la hora de llevar a cabo el envío de otro tipo de información distinta de las cadenas de caracteres o números hay que conocer las clases que modelan el envío de objetos a través de sockets. En función del protocolo a utilizar se emplearán unas clases u otras.
+
+### Envío de objetos mediante sockets basados en TCP
+
+Como ya se ha visto para cadenas, hay que construir *streams* o flujos que contendrán la información a enviar. Cuando se trata de objetos, este comportamiento se modela mediante las clases [*ObjectInputStream*](https://docs.oracle.com/javase/7/docs/api/java/io/ObjectInputStream.html) y [*ObjectOutputStream*](https://docs.oracle.com/javase/7/docs/api/java/io/ObjectOutputStream.html)
+
+```java
+public class TCPObjetoServidor1 {
+  public static void main(String[] arg) throws IOException,
+						ClassNotFoundException {
+   int numeroPuerto = 6543;// Puerto local para el envío
+   ServerSocket servidor =  new ServerSocket(numeroPuerto);
+   System.out.println("Esperando al cliente.....");   
+   Socket cliente = servidor.accept();
+	
+   //flujo de salida para objetos 		
+   ObjectOutputStream objSalida = new ObjectOutputStream(cliente.getOutputStream()); 	
+   
+   // Se prepara un objeto y se envía 
+   PersonaModel persona = new PersonaModel("Pedro", 43);
+   objSalida.writeObject(persona); //enviando objeto
+   System.out.println("Envio: " + persona.getNombre() +", "+ persona.getEdad());  
+
+   
+   // Se obtiene un stream para leer objetos
+   ObjectInputStream objetoEntrada = new ObjectInputStream(cliente.getInputStream());
+   PersonaModel dato = (PersonaModel) objetoEntrada.readObject();
+   System.out.println("Recibo: "+dato.getNombre()+", "+dato.getEdad());
+		
+   // CERRAR STREAMS Y SOCKETS
+   objSalida.close();
+   objetoEntrada.close();
+   cliente.close();
+   servidor.close();
+  }
+}
+
+/*
+
+	* Importante crear en los dos lados los flujos de entrada y salida. Primero se crea el de salida y luego el de entrada.
+	* Ver Javadoc object stream header
+	* El modelo que se use como objeto a intercambiar debe ser serializable (implementar dicho interface)
+
+*/
+
+public class TCPObjetoCliente1 {
+  public static void main(String[] arg) throws IOException,ClassNotFoundException {
+    
+    String Host = "localhost";
+    int Puerto = 6543;//puerto del servidor	
+		
+    System.out.println("PROGRAMA CLIENTE INICIADO....");
+    Socket cliente = new Socket(Host, Puerto);	
+	
+    //Flujo de entrada
+    ObjectInputStream objEntrada = new ObjectInputStream(cliente.getInputStream());
+    
+    //Se recibe un objeto
+    PersonaModel personaRec = (PersonaModel) objEntrada.readObject();//recibo objeto
+    System.out.println("Recibo: " personaRec.getNombre()+"*" personaRec.getEdad());
+	
+    //Modifico el objeto
+    personaRec.setNombre("Pepito Perez");
+    personaRec.setEdad(55);
+	
+    //Flujo de salida
+    ObjectOutputStream objSalida = new ObjectOutputStream(cliente.getOutputStream());
+    
+    // Se envía el objeto
+    objSalida.writeObject(personaRec);
+    System.out.println("Envio: " personaRec.getNombre()+", " personaRec.getEdad());                       
+		
+    // CERRAR STREAMS Y SOCKETS
+    objEntrada.close();
+    objSalida.close();
+    cliente.close();		
+  }
+}
+```
+
+### Envío de objetos mediante sockets basados en UDP
+
+Para poder hacer el intercambio de objetos Java mediante sockets UDP se pueden utilizar las clases [ByteArrayOutputStream](https://docs.oracle.com/javase/7/docs/api/java/io/ByteArrayOutputStream.html) y [ByteArrayInputStream](https://docs.oracle.com/javase/7/docs/api/java/io/ByteArrayInputStream.html). Como se supondrá, el objeto debe convertirse en un array de bytes.
+
+```java 
+Persona persona = new Persona("Juan", 25);
+
+// OBJETO A BYTES
+ByteArrayOutputStream baos = new ByteArrayOutputStream();
+ObjectOutputStream out = new ObjectOutputStream(baos);
+
+out.writeObject(persona); //Se escribe el objeto persona en el stream
+
+out.close(); // Se cierra el stream
+
+byte[] bytes = baos.toByteArray(); // se toma  el objeto transformado en bytes
+
+/* 
+ * En cambio, para los datos recibidos (bytes) por el datagrama en un objeto Persona habría que hacer lo siguiente:
+*/
+
+// BYTES A OBJETO
+byte[] recibido = new byte[1024];
+DatagramPacket paqRecibido = new DatagramPacket(recibido, recibido.length);
+socket.receive(paqRecibido);
+
+//Pasamos bytes a objeto
+ByteArrayInputStream bais = new ByteArrayInputStream(recibido);
+ObjectInputStream in = new ObjectInputStream(bais);
+Persona persona = (Persona)in.readObject(); //Se obtiene el objeto recibido como bytes
+in.close();
+```
 
 
+## Gestión de clientes múltiples (threads)
+
+Cuando se necesita que un servidor pueda atender a más de un cliente de forma simultánea, se impone la necesidad de la programación *multihilo* de manera que cada cliente pueda ser atendido por un hilo. 
+
+En TCP, la filosofía básica es crear un servidor común que acepte las peticiones de los clientes, pero de forma que cada una de ellas sea gestionada por un _hilo_ diferente. 
+
+```java
+import java.io.*;
+import java.net.*;
+
+public class Servidor {
+  public static void main(String args[]) throws IOException  {
+    ServerSocket servidor;    
+    servidor = new ServerSocket(6000);
+    
+    while (true) {  
+      Socket cliente = new Socket();
+      cliente=servidor.accept();//esperando cliente 
+      HiloServidor hilo = new HiloServidor(cliente);
+      hilo.start();   
+    }
+  }
+}
+```
+
+En este caso por ejemplo, el cliente envía una cadena al servidor que éste devuelve en mayúsculas hasta que reciba un asterisco (que finaliza la conexión con el cliente). En la clase _HiloServidor_ se hace la gestión de cada cliente.
 
 
+```java 
+import java.io.*;
+import java.net.*;
 
+public class Servidor {
+    public static void main(String args[]) throws IOException  {
+        ServerSocket servidor;      
+        servidor = new ServerSocket(6000);
+        System.out.println("Servidor iniciado...");
+        
+        while (true) {  
+            Socket cliente = new Socket();
+            cliente=servidor.accept();//esperando cliente   
+            HiloServidor hilo = new HiloServidor(cliente);
+            hilo.start();       
+        }
+    }
+}
+```
+Las operaciones de un cliente concreto se gestionan por el hilo, lo que permite que el servidor se mantenga a la escucha y no interrumpa su proceso mientras que los clientes ven resueltas sus peticiones. Vemos un algoritmo en el que el servidor devolverá la cadena recibida pero en mayúsculas hasta que reciba un asterisco.
 
+```java
+import java.io.*;
+import java.net.*;
 
+public class HiloServidor extends Thread {
+  BufferedReader fentrada;
+  PrintWriter fsalida;
+  Socket socket = null;
+
+  public HiloServidor(Socket s) throws IOException {// CONSTRUCTOR
+    socket = s;
+    // se crean flujos de entrada y salida
+    fsalida = new PrintWriter(socket.getOutputStream(), true);
+    fentrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+  }
+
+  public void run() {// tarea a realizar con el cliente
+    String cadena = "";
+
+    System.out.println("COMUNICO CON: " + socket.toString());
+
+    while (!cadena.trim().equals("*")) {
+
+      try {
+        cadena = fentrada.readLine();
+      } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      } // obtener cadena
+      fsalida.println(cadena.trim().toUpperCase());// enviar mayúscula
+    } // fin while
+
+    System.out.println("FIN CON: " + socket.toString());
+
+    fsalida.close();
+    try {
+      fentrada.close();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    try {
+      socket.close();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+}
+```
+
+Para el cliente, podria servir alguno de los ya vistos en las secciones previas. Por ejemplo el siguiente:
+
+```java
+public class Cliente {
+  public static void main(String[] args) throws IOException {
+    String Host = "localhost";
+    int Puerto = 6000;// puerto remoto
+    Socket Cliente = new Socket(Host, Puerto);
+        
+    // CREO FLUJO DE SALIDA AL SERVIDOR 
+    PrintWriter fsalida = new PrintWriter (Cliente.getOutputStream(), true);
+    // CREO FLUJO DE ENTRADA AL SERVIDOR    
+    BufferedReader fentrada =  new BufferedReader
+         (new InputStreamReader(Cliente.getInputStream()));
+         
+    // FLUJO PARA ENTRADA ESTANDAR
+    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+    String cadena, eco="";
+        
+    
+    do{ 
+        System.out.print("Introduce cadena: ");
+        cadena = in.readLine();
+        fsalida.println(cadena);
+        eco=fentrada.readLine();            
+        System.out.println("  =>ECO: "+eco);    
+    } while(!cadena.trim().equals("*"));
+        
+    fsalida.close();
+    fentrada.close();
+    System.out.println("Fin del envío... ");
+    in.close();
+    Cliente.close();
+    }
+}
+```
 
 
 
