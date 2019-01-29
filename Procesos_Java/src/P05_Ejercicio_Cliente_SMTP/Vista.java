@@ -2,6 +2,7 @@ package P05_Ejercicio_Cliente_SMTP;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JButton;
@@ -18,7 +19,7 @@ public class Vista implements KeyListener, MouseListener{
 	private JFrame frmClienteSmtp;
 	private JTextField textServidor;
 	private JTextField textUsuario;
-	private JTextField textContrasena;
+	private JPasswordField textContrasena;
 	private JTextField textRemitente;
 	private JTextField textDestinatario;
 	private JTextField textAsunto;
@@ -83,9 +84,10 @@ public class Vista implements KeyListener, MouseListener{
 		lblContrasea.setBounds(0, 0, 86, 14);
 		panel_2.add(lblContrasea);
 		
-		textContrasena = new JTextField();
+		textContrasena = new JPasswordField();
 		textContrasena.setColumns(10);
 		textContrasena.setBounds(0, 17, 186, 20);
+		textContrasena.setEchoChar('*');
 		panel_2.add(textContrasena);
 		
 		JPanel panel_3 = new JPanel();

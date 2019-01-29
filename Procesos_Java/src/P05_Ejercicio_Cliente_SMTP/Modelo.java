@@ -80,15 +80,14 @@ public class Modelo {
 				// se realiza la autenticaci�n con el servidor
 				if (client.auth(AuthenticatingSMTPClient.AUTH_METHOD.LOGIN, username, password)) {
 					System.out.println("4 - " + client.getReplyString());
-					destino1 = "fulanito@gmail.com";
-					asunto = "Prueba de SMTPClient con Gmail";
-					mensaje = "Esto es una prueba de mensaje con usuario autenticado desde Java.";
+					
 					// se crea la cabecera
 					SimpleSMTPHeader cabecera = new SimpleSMTPHeader(remitente, destino1, asunto);
 
 					// el nombre de usuario y el email de origen coinciden
 					client.setSender(remitente);
 					client.addRecipient(destino1);
+					client.addRecipient(cc);
 					System.out.println("5 - " + client.getReplyString());
 
 					// se envia DATA
