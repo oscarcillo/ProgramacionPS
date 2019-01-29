@@ -32,3 +32,5 @@ y Procesos del Ciclo D.A.M.
 ### P05 - Generación de Servicios en Red
 
 * [Generación de Servicios en Red](https://github.com/oscarcillo/ProgramacionPS/tree/master/Procesos_Java/src/P05_Generacion_Servicios_Red) - Ejemplos de FTP y SMTP en Java
+
+* [Ejercicio Creación de cliente SMTP para enviar correos](https://github.com/oscarcillo/ProgramacionPS/tree/master/Procesos_Java/src/P05_Ejercicio_Cliente_SMTP) - Ejercicio Creación de cliente SMTP para enviar correos
