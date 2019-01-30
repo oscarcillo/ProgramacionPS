@@ -42,7 +42,7 @@ public class Modelo {
 		AuthenticatingSMTPClient client = new AuthenticatingSMTPClient();
 
 		// datos del usuario y del servidor
-		int puerto = 587;
+		int puerto = 25;
 
 		try {
 			int respuesta;
@@ -83,11 +83,11 @@ public class Modelo {
 					
 					// se crea la cabecera
 					SimpleSMTPHeader cabecera = new SimpleSMTPHeader(remitente, destino1, asunto);
+					cabecera.addCC(cc);
 
 					// el nombre de usuario y el email de origen coinciden
 					client.setSender(remitente);
 					client.addRecipient(destino1);
-					client.addRecipient(cc);
 					System.out.println("5 - " + client.getReplyString());
 
 					// se envia DATA
