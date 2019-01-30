@@ -80,7 +80,7 @@ public class Vista implements KeyListener, MouseListener{
 		panel_2.setBounds(260, 102, 196, 43);
 		frmClienteSmtp.getContentPane().add(panel_2);
 		
-		JLabel lblContrasea = new JLabel("ContraseÃ±a");
+		JLabel lblContrasea = new JLabel("Contraseña");
 		lblContrasea.setBounds(0, 0, 86, 14);
 		panel_2.add(lblContrasea);
 		
