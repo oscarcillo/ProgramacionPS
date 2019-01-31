@@ -31,6 +31,7 @@ public class clienteFicheros extends JFrame implements Runnable {
 	JButton botonCargar = new JButton("Subir fichero");
 	JButton botonDescargar = new JButton("Descargar fichero");
 	JButton botonSalir = new JButton("Salir");
+	JButton botonEntrar = new JButton("Entrar en Carpeta");
 	
 	// lista para los datos del directorio
 	@SuppressWarnings("rawtypes")
@@ -74,7 +75,7 @@ public class clienteFicheros extends JFrame implements Runnable {
 		cab2.setFont(new Font("Arial", Font.BOLD, 14));
 		cab2.setForeground(Color.blue);
 
-		cab3.setBounds(new Rectangle(5, 34, 300, 30));
+		cab3.setBounds(new Rectangle(5, 34, 1000, 30));
 		cab3.setBorder(null);
 		cab3.setFont(new Font("Arial", Font.BOLD, 14));
 		cab3.setForeground(Color.blue);
@@ -82,6 +83,7 @@ public class clienteFicheros extends JFrame implements Runnable {
 		botonCargar.setBounds(new Rectangle(350, 100, 140, 30));
 		botonDescargar.setBounds(new Rectangle(350, 150, 140, 30));
 		botonSalir.setBounds(new Rectangle(350, 200, 140, 30));
+		botonEntrar.setBounds(new Rectangle(350, 250, 140, 30));
 	
 		listaDirec.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);// SINGLE_INTERVAL_SELECTION);
 		JScrollPane barraDesplazamiento = new JScrollPane(listaDirec);
@@ -98,6 +100,9 @@ public class clienteFicheros extends JFrame implements Runnable {
 		c.add(botonDescargar);
 
 		c.add(botonSalir);
+		
+		botonEntrar.setEnabled(false);
+		c.add(botonEntrar);
 
 		c.add(cab);
 		c.add(cab2);
@@ -109,6 +114,24 @@ public class clienteFicheros extends JFrame implements Runnable {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(510, 450);
 		setVisible(true);
+		
+		// --click en el boton de entrar a carpeta
+		botonEntrar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				direcSelec = direcSelec +"\\"+ nodo.getName();
+				cab3.setText("RAIZ " + direcSelec);
+				//obtengo de nuevo la lista de ficheros
+				
+				try {
+					nodo = (EstructuraFicheros) inObjeto.readObject();
+				} catch (ClassNotFoundException e1) {
+				} catch (IOException e1) {}
+				EstructuraFicheros[] lista = nodo.getLista();
+				direcSelec = nodo.getPath();
+				llenarLista(lista, nodo.getNumeFich());
+				campo2.setText("Número de ficheros en el directorio: " + lista.length);
+			}
+		});
 
 		// --clic en un elemento de la lista
 		listaDirec.addListSelectionListener(new ListSelectionListener() {
@@ -119,9 +142,11 @@ public class clienteFicheros extends JFrame implements Runnable {
 				    nodo = (EstructuraFicheros) listaDirec.getSelectedValue();					
 					if (nodo.isDir()) {
 						// es un directorio
-                       campo.setText("FUNCIÓN NO IMPLEMENTADA..... " );
+						botonEntrar.setEnabled(true);
+                       campo.setText("Carpeta " );
 					} else {
 						// SE TRATA DE UN FICHERO
+						botonEntrar.setEnabled(false);
 						ficheroSelec = nodo.getName();
 						ficherocompleto = nodo.getPath();
 						campo.setText("FICHERO seleccionado: " + ficheroSelec);
@@ -274,7 +299,7 @@ public class clienteFicheros extends JFrame implements Runnable {
 	public static void main(String[] args) throws IOException {
 		int puerto = 44441;
 		//"192.168.0.195" localhost
-		Socket s = new Socket("192.168.4.139", puerto);
+		Socket s = new Socket("localhost", puerto);
 		clienteFicheros hiloC = new clienteFicheros(s);
 		hiloC.setBounds(0, 0, 540, 500);
 		hiloC.setVisible(true);
