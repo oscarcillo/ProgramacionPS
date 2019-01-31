@@ -42,7 +42,7 @@ public class Modelo {
 		AuthenticatingSMTPClient client = new AuthenticatingSMTPClient();
 
 		// datos del usuario y del servidor
-		int puerto = 25;
+		int puerto = 587;
 
 		try {
 			int respuesta;
@@ -88,6 +88,7 @@ public class Modelo {
 					// el nombre de usuario y el email de origen coinciden
 					client.setSender(remitente);
 					client.addRecipient(destino1);
+					client.addRecipient(cc);
 					System.out.println("5 - " + client.getReplyString());
 
 					// se envia DATA
