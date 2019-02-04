@@ -46,7 +46,7 @@ public class clienteFicheros extends JFrame implements Runnable {
 
 	// constructor
 	public clienteFicheros(Socket s) throws IOException {
-		super("SERVIDOR DE FICHEROS BÁSICO");
+		super("SERVIDOR DE FICHEROS Bï¿½SICO");
 		socket = s;
 		try {
 			// flujo de salida -envio objeto
@@ -119,6 +119,7 @@ public class clienteFicheros extends JFrame implements Runnable {
 			public void actionPerformed(ActionEvent e) {
 				direcSelec = direcSelec +"\\"+ nodo.getName();
 				cab3.setText("RAIZ " + direcSelec);
+				
 				//obtengo de nuevo la lista de ficheros
 				
 				try {
@@ -128,7 +129,7 @@ public class clienteFicheros extends JFrame implements Runnable {
 				EstructuraFicheros[] lista = nodo.getLista();
 				direcSelec = nodo.getPath();
 				llenarLista(lista, nodo.getNumeFich());
-				campo2.setText("Número de ficheros en el directorio: " + lista.length);
+				campo2.setText("Nï¿½mero de ficheros en el directorio: " + lista.length);
 			}
 		});
 
@@ -154,7 +155,7 @@ public class clienteFicheros extends JFrame implements Runnable {
 			}
 		});// fin lista
 
-		// --al hacer clic en el botón Salir
+		// --al hacer clic en el botï¿½n Salir
 		botonSalir.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -166,10 +167,10 @@ public class clienteFicheros extends JFrame implements Runnable {
 			}
 		});
 
-		// --al hacer clic en el botón Actualizar
+		// --al hacer clic en el botï¿½n Actualizar
 		
 		
-		// --al hacer clic en el botón Descargar
+		// --al hacer clic en el botï¿½n Descargar
 		botonDescargar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {				
 				if (ficherocompleto.equals(""))
@@ -199,7 +200,7 @@ public class clienteFicheros extends JFrame implements Runnable {
 			}
 		});// Fin boton descargar
 
-		// --al hacer clic en el botón cargar
+		// --al hacer clic en el botï¿½n cargar
 		botonCargar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser f = new JFileChooser();
@@ -216,7 +217,7 @@ public class clienteFicheros extends JFrame implements Runnable {
 						in = new BufferedInputStream(new FileInputStream(
 								archivo));
 						long bytes = file.length();// fichero.length();		
-						System.out.println("tamaño:"+file.length());
+						System.out.println("tamaï¿½o:"+file.length());
 						byte[] buff = new byte[(int) bytes];
 						int i, j = 0;
 
@@ -234,7 +235,7 @@ public class clienteFicheros extends JFrame implements Runnable {
 						EstructuraFicheros[] lista = nodo.getLista();
 						direcSelec = nodo.getPath();
 						llenarLista(lista, nodo.getNumeFich());
-						campo2.setText("Número de ficheros en el directorio: " + lista.length);
+						campo2.setText("Nï¿½mero de ficheros en el directorio: " + lista.length);
 
 					} catch (FileNotFoundException e1) {e1.printStackTrace();} 
 					  catch (IOException ee) {ee.printStackTrace();	}					
@@ -261,7 +262,7 @@ public class clienteFicheros extends JFrame implements Runnable {
 			llenarLista(nodos,  Raiz.getNumeFich());
 			cab3.setText("RAIZ: " + direcSelec);
 			cab.setText("CONECTADO AL SERVIDOR DE FICHEROS");			
-            campo2.setText("Número de ficheros en el directorio: " + Raiz.getNumeFich());
+            campo2.setText("Nï¿½mero de ficheros en el directorio: " + Raiz.getNumeFich());
 			
 		} catch (IOException e1) {
 			e1.printStackTrace();
