@@ -9,7 +9,6 @@ import java.awt.*;
 import java.awt.event.*;
 
 
-
 public class clienteFicheros extends JFrame implements Runnable {
 	private static final long serialVersionUID = 1L;	
 	static Socket socket;
