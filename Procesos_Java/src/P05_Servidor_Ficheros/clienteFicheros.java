@@ -310,11 +310,11 @@ public class clienteFicheros extends JFrame implements Runnable {
 		listaDirec.setFont(fuente);
 		listaDirec.removeAll();		
 		
-		//añadir opcion para volver
+		//aï¿½adir opcion para volver
 		
 		if (listaDirectorios.size() != 1) {
 			EstructuraFicheros carpetaAnterior = new EstructuraFicheros(listaDirectorios.get(listaDirectorios.size()-1));
-			carpetaAnterior.setName("(...)");
+			carpetaAnterior.setName("(...Volver)");
 			modeloLista.addElement(carpetaAnterior);
 		}
 		
