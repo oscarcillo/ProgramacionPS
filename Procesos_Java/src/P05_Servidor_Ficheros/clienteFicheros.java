@@ -5,14 +5,18 @@ import javax.swing.event.*;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.awt.*;
 import java.awt.event.*;
 
 
 public class clienteFicheros extends JFrame implements Runnable {
+	
+	static ArrayList<String> listaDirectorios = new ArrayList<>();
+	
 	private static final long serialVersionUID = 1L;	
 	static Socket socket;
-	EstructuraFicheros nodo = null;
+	static EstructuraFicheros nodo = null;
 	ObjectInputStream inObjeto;
 	ObjectOutputStream outObjeto;
     EstructuraFicheros Raiz;
@@ -113,23 +117,43 @@ public class clienteFicheros extends JFrame implements Runnable {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(510, 450);
 		setVisible(true);
+	
 		
 		// --click en el boton de entrar a carpeta
 		botonEntrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				direcSelec = direcSelec +"\\"+ nodo.getName();
-				cab3.setText("RAIZ " + direcSelec);
+
+				if(nodo.getPath() != listaDirectorios.get((listaDirectorios.size()-1))) {
+					listaDirectorios.add(direcSelec);
+					direcSelec = direcSelec +"\\"+ nodo.getName();
+					cab3.setText("RAIZ " + direcSelec);
+					System.out.println(listaDirectorios.get(listaDirectorios.size()-1));
+				}else {
+					direcSelec = listaDirectorios.get(listaDirectorios.size()-1);
+					System.out.println(direcSelec);
+					listaDirectorios.remove(listaDirectorios.size()-1);
+					cab3.setText("RAIZ " + direcSelec);
+					System.out.println(listaDirectorios.get(listaDirectorios.size()-1));
+				}
 				
-				//obtengo de nuevo la lista de ficheros
-				
+				//
+				CambioDirectorio cd = new CambioDirectorio(direcSelec);
 				try {
+					outObjeto.writeObject(cd);
+					//obtengo de nuevo la lista de ficheros
 					nodo = (EstructuraFicheros) inObjeto.readObject();
-				} catch (ClassNotFoundException e1) {
-				} catch (IOException e1) {}
+				} catch (IOException | ClassNotFoundException e1) {
+					e1.printStackTrace();
+				}
 				EstructuraFicheros[] lista = nodo.getLista();
 				direcSelec = nodo.getPath();
-				llenarLista(lista, nodo.getNumeFich());
-				campo2.setText("Nï¿½mero de ficheros en el directorio: " + lista.length);
+				try {
+					llenarLista(lista, nodo.getNumeFich());
+				} catch (FileNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				campo2.setText("Numero de ficheros en el directorio: " + lista.length);
 			}
 		});
 
@@ -258,11 +282,13 @@ public class clienteFicheros extends JFrame implements Runnable {
 			EstructuraFicheros[] nodos = Raiz.getLista();//	 		
 			// Directorio seleccionadoara saber directorio y fichero seleccionado
 			direcSelec = Raiz.getPath();  
+			listaDirectorios.add(direcSelec);
 			//if(Raiz.getNumeFich()> 0)
 			llenarLista(nodos,  Raiz.getNumeFich());
 			cab3.setText("RAIZ: " + direcSelec);
 			cab.setText("CONECTADO AL SERVIDOR DE FICHEROS");			
             campo2.setText("Nï¿½mero de ficheros en el directorio: " + Raiz.getNumeFich());
+           
 			
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -276,13 +302,21 @@ public class clienteFicheros extends JFrame implements Runnable {
 		// -----------------------------------------------------------------
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static void llenarLista(EstructuraFicheros[] files, int numero) {
+	private static void llenarLista(EstructuraFicheros[] files, int numero) throws FileNotFoundException {
 		if (numero==0) return;
 		DefaultListModel modeloLista = new DefaultListModel();
 		listaDirec.setForeground(Color.blue);
 		Font fuente = new Font("Courier", Font.PLAIN, 12);
 		listaDirec.setFont(fuente);
 		listaDirec.removeAll();		
+		
+		//añadir opcion para volver
+		
+		if (listaDirectorios.size() != 1) {
+			EstructuraFicheros carpetaAnterior = new EstructuraFicheros(listaDirectorios.get(listaDirectorios.size()-1));
+			carpetaAnterior.setName("(...)");
+			modeloLista.addElement(carpetaAnterior);
+		}
 		
 		for (int i = 0; i < files.length; i++)
 			modeloLista.addElement(files[i]);

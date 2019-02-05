@@ -107,5 +107,9 @@ public class EstructuraFicheros implements Serializable {
 		}
 		return lista;
 	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
 
 }// ..EstructuraFicheros
