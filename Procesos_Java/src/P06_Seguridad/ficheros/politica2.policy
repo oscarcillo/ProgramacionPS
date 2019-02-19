@@ -1,0 +1,4 @@
+grant codeBase  "file:/C:/Users/ifc/git/ProgramacionPSoSCAR/Procesos_Java/bin/P06_Seguridad/"{
+      permission java.io.FilePermission "C:\\Users\\ifc\\git\\ProgramacionPSoSCAR\\Procesos_Java\\src\\P06_Seguridad\\ficheros\\*", "read, write";
+     
+};
