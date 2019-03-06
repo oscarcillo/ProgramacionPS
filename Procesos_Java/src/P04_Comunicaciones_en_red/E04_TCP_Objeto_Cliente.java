@@ -9,34 +9,32 @@ public class E04_TCP_Objeto_Cliente {
 
 	 public static void main(String[] arg) throws IOException,ClassNotFoundException {
 		    
-		    String Host = "localhost";
+		  String Host = "localhost";
 		    int Puerto = 6543;//puerto del servidor	
 				
 		    System.out.println("PROGRAMA CLIENTE INICIADO....");
 		    Socket cliente = new Socket(Host, Puerto);	
 			
+		    //Flujo de salida
+		    ObjectOutputStream objSalida = new ObjectOutputStream(cliente.getOutputStream());
+		    
+		    Persona persona = new Persona("Oscar", 21);
+		    
+		    // Se envï¿½a el objeto
+		    objSalida.writeObject(persona);
+		    System.out.println("Envio: "+ persona.getNombre()+", " +persona.getEdad());    
+		    
 		    //Flujo de entrada
 		    ObjectInputStream objEntrada = new ObjectInputStream(cliente.getInputStream());
 		    
 		    //Se recibe un objeto
 		    Persona personaRec = (Persona) objEntrada.readObject();//recibo objeto
-		    System.out.println("Recibo: " +personaRec.getNombre()+"*" +personaRec.getEdad());
-			
-		    //Modifico el objeto
-		    personaRec.setNombre("Óscar Tutor");
-		    personaRec.setEdad(55);
-			
-		    //Flujo de salida
-		    ObjectOutputStream objSalida = new ObjectOutputStream(cliente.getOutputStream());
-		    
-		    // Se envía el objeto
-		    objSalida.writeObject(personaRec);
-		    System.out.println("Envio: "+ personaRec.getNombre()+", " +personaRec.getEdad());                       
+		    System.out.println("Recibo: " +personaRec.getNombre()+", " +personaRec.getEdad());
 				
 		    // CERRAR STREAMS Y SOCKETS
-		    objEntrada.close();
+		    //objEntrada.close();
 		    objSalida.close();
-		    cliente.close();		
+		    cliente.close();			
 		  }
 	
 }
