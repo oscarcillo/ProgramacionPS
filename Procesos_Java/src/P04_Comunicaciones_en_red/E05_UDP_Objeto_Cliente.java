@@ -14,7 +14,7 @@ public class E05_UDP_Objeto_Cliente {
 	 public static void main(String[] arg) throws IOException,ClassNotFoundException {
 		    
 		int puerto = 9999;
-		InetAddress destino = InetAddress.getByName("192.168.7.22"); // Obtenemos la IP del host local
+		InetAddress destino = InetAddress.getByName("localhost"); // Obtenemos la IP del host local
 		 
 		// OBJETO A BYTES
 		Persona persona = new Persona("Juan", 25);

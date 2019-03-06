@@ -1,467 +1,453 @@
-# Programación de comunicaciones en red
+# Generación de Servicios en Red
 
 ## Introducción
-## Clases Java para comunicaciones en red
 
-TCP/IP es una familia de protocolos para permitir la comunicación entre cualquier par de ordenadores de cualquier red o fabricante, respetando los protocolos de cada red individual. Afecta a 4 capas:
+*Un servicio de red es la creación de una red de trabajo en un ordenador. Generalmente los servicios de red son instalados en uno o más firewalles del servidor seleccionado. Eso facilita el uso y el fallo de muchos usuarios.* [Wikipedia, Servicios de red](https://es.wikipedia.org/wiki/Servicio_de_red)
 
-### Niveles OSI
-* Físico
-* Enlace
-	* Es la interfaz con la red real. Comunica la capa de red con la física (el hardware).
-* Red
-	* Se dedica a seleccionar la mejor ruta para el envio de paquetes por la red. Protocolo IP.
-* Transporte
-	* Suministra a las aplicaciones un servicio de comunicaciones e2e mediante dos protocolos: TCP y UDP
-* Sesión
-* Presentación
-* Aplicación
-	* Son las aplicaciones que están disponibles para los usuarios: FTP, SMTP, TELNET...
+Además, puede decirse que son programas auxiliares utilizados para gestionar recursos. Cabe pensar en la utilización que se hace de herramientas que se utilizan de forma remota: una impresora en red, el intercambio de ficheros, etc. Todos ellos constituyen ejemplos de servicios de red. El esquema más habitual de arquitectura en este tipo de servicios es cliente-servidor.
 
+## Protocolos estándar de comunicación en red a nivel de aplicación (ftp, http, pop3, smtp, telnet).
 
-Los equipos conectados a internet utilizan el procotolo TCP o UDP. Hay alguna diferencia entre ambos.
+A partir del modelo TCP/IP se constituyen toda una serie de servicios o aplicaciones en los niveles más altos del esquema OSI. Por poner unos ejemplos:
 
-* TCP: Orientado a conexión. Se busca garantizar que los paquetes lleguen y que lo hagan de forma ordenada (conforme han sido enviados).
-* UDP: No Orientado a conexión. Se envian datagramas sin garantizar que lleguen ni que lo hagan de forma ordenada.
+* TELNET (Conexión remota)
+* FTP (File Transfer Protocol)
+* SNMP (Simple Network Management Protocol)
+* SMTP (Simple Mail Transfer Protocol)
+* HTTP o HTTPS (Hiper Text Transfer Protocol (Secure))
 
-### Los puertos
-TCP y UDP utilizan puertos para asignar datos entrantes a un proceso en particular que se ejecuta en una máquina. Los datos transmitidos a través de Internet identifican la máquina y el puerto al que van destinados. Se destinan 32 bits (IPv4) para la máquina y 16 para el puerto. TCP una aplicación de servidor vincula un socket a un número de puerto específico, lo que supone registrar el servidor en el sistema para recibir los datos destinados a ese puerto. Por otro lado, en UDP el número de puerto se adjunta al datagrama para llegar a la aplicación correcta.
+Otras herramientas como DNS o TFTP pueden estar basadas en el protocolo UDP y también son servicios de red. Se suelen considerar habitualmente de la misma familia que los anteriores.
 
+## Protocolo FTP
 
-## Las clases
-Cuando se escriben programas en Java, se trabaja a nivel de aplicación y se abstraen los protocolos de red mediante las clases presentes en el package *java.net* que incluye varias clases:
+*El Protocolo de transferencia de archivos (en inglés File Transfer Protocol o FTP) es un protocolo de red para la transferencia de archivos entre sistemas conectados a una red TCP (Transmission Control Protocol), basado en la arquitectura cliente-servidor. Desde un equipo cliente se puede conectar a un servidor para descargar archivos desde él o para enviarle archivos, independientemente del sistema operativo utilizado en cada equipo.* [Wikipedia, Protocolo FTP](https://es.wikipedia.org/wiki/Protocolo_de_transferencia_de_archivos)
 
-* URL; Cuyos objetos representan un puntero a un recurso en la Web.
-* URLConnection; Para operaciones más complejas en las URL.
-* ServerSocket y Socket, para dar soporte a sockets TCP. ServerSocket se utiliza desde el lado del servidor para crear un socket en el puerto en el que escucha las peticiones de conexión de los clientes. Socket por su parte se utiliza tanto en cliente como en servidor para comunicarse entre sí leyendo y escribiendo datos mediante streams.
-* DatagramSocket MulticastSocket y DatagramPacket para el uso del protocolo UDP.
-* InetAddress para representar direcciones de Internet. Tiene dos subclases *Inet4Address* e *Inet6Address*, aunque en la mayoría de los casos con la clase principal suele ser suficiente. Algunos de los métodos más relevantes de *InetAddress* son:
+### Acceso anónimo y autorizado
+
+* Anónimo:  La comunicación se realiza sin ningún tipo de identificación y, por lo tanto el usuario tendrá muy pocos privilegios en el servidor. En este caso, el usuario estará confinado en un directorio público donde puede descargar los archivos allí ubicados pero sin posibilidad de escribir o modificar ningún fichero.
+
+* Autorizado:  El usuario establece la comunicación con una cuenta de usuario. Tras identificarse, se dirige al usuario a su directorio predeterminado desde el que puede descargar ficheros y escribir si está autorizado. Este tipo de acceso es el habitual a la hora de gestionar los contenidos de servidores web.
+
+### Comunicación con el servidor FTP
+
+Este protocolo utiliza dos conexiones diferentes, una para el control y otra para la transferencia de los datos. La primera establece y mantiene la comunicación cliente-servidor y la segunda ejecuta las transferencias de información. Mientras que la primera está abierta mientras dura la sesión, la segunda solo se produce cuando hay transferencia de información. Ambas usan puertos diferentes 21 y 20 respectivamente del lado del servidor y aleatorios en el cliente, suele ser lo más habitual. El cliente tiene dos modos de actuar, activo y pasivo.
 
 
-### La clase InetAddress
+* Modo Activo
 
-Algunos de los métodos más relevantes de *InetAddress* son:
+Es el modo FTP estándar o PORT, donde el cliente envía comandos tipo PORT al servidor al establecer la conexión.
 
-* InetAddress getLocalHost() Devuelve un objeto de InetAddress que representa la dirección IP de la máquina donde se está ejecutando el programa.
-* InetAddress getByName(String host) Devuelve un objeto de InetAddress que representa la dirección IP de la máquina que se especifica como parámetro (host). Este parámetro puede se el nombre de la máquina, un nombre de dominio o una IP. *Es el más habitual para crear objetos de la clase*. 
-* InetAddress[] getAllByName(String host) Devuelve un array de InetAddress. Sirve para obtener todas las IP que tenga asignadas una máquina concreta.
-* String getHostAddress() Devuelve la dirección IP de un objeto InetAddress en forma de cadena.
-* String getHostName() Devuelve el nombre del host de un objeto InetAddress.
-* String getCanonicalHostName() Obtiene el nombre canónico completo (suele ser la dirección real del host) de un objeto InetAddress.
+En el modo activo el servidor siempre crea el canal de datos en su puerto 20, mientras que el cliente se asocia a un puerto aleatorio mayor a 1024.
 
-### Los Sockets
+Para esto, el cliente envía un comando PORT al servidor por el canal control, indicando el número de puerto, para así lograr la conexión de datos para la transferencia de los archivos.
 
-* Socket designa un concepto abstracto por el cual dos programas (posiblemente situados en computadoras distintas) pueden intercambiar cualquier flujo de datos, generalmente de manera fiable y ordenada.
+Este tipo de FTP tiene un grave problema de seguridad; el cliente puede aceptar cualquier conexión de entrada lo que la vuelve susceptible.
 
-El término socket es también usado como el nombre de una interfaz de programación de aplicaciones (API) para la familia de protocolos de Internet TCP/IP, provista usualmente por el sistema operativo.
+Los equipos con cortafuegos, rechazan estas conexiones aleatorias.
 
-Los sockets de Internet constituyen el mecanismo para la entrega de paquetes de datos provenientes de la tarjeta de red a los procesos o hilos apropiados. Un socket queda definido por un par de direcciones IP local y remota, un protocolo de transporte y un par de números de puerto local y remoto. * Fuente: [Wikipedia, socket](https://es.wikipedia.org/wiki/Socket_de_Internet)
-
-En nuestro contexto, los socket nos proporcionan los extremos de la comunicación entre aplicaciones y/o procesos. Es por lo tanto, un conector. Dicho conector debe tener asociados dos campos; dirección IP del equipo de destino y puerto local asignado a la aplicación.
+![alt-text](http://www.worldofintegration.com/sites/default/files/pictures_for_content/WOI_protocols/FTPactive.JPG "Esquema Modo Activo. Fuente: http://www.worldofintegration.com/sites/default/files/pictures_for_content/WOI_protocols/FTPactive.JPG")
 
 
-### La clase ServerSocket (SOCKET TCP)
+* Modo Pasivo
 
-Viene incluida en java.net e implementa el lado del servidor en la comunicación. Establece un conector en el puerto que *escucha* las peticiones de los clientes.
+En el modo pasivo, es siempre el programa del cliente quien inicia la conexión con el servidor.
 
-### La clase Socket (SOCKET TCP)
+El cliente en el modo pasivo inicia ambas conexiones (control y datos), por lo que la conexión no es filtrada por el cortafuegos.
 
-También incluida en java.net, implementa el extremo de la conexión. 
+Una vez creada la primera conexión, el cliente pasa a modo pasivo enviando el comando PASV y pidiendo un puerto abierto al servidor, para así establecer la conexión final.
 
-### Proceso de gestión simple de Socket TCP
+En este caso, no se utiliza el canal de datos del puerto 20 del servidor, a diferencia de como ocurre siempre en el modo activo.
 
-1. El programa servidor crea un socket servidor definiendo un puerto.
-2. En caso de que el cliente solicite conectarse, debe aceptarlo mediante *accept()*. 
-3. El cliente establecerá conexión a través del puerto especificado mediante *Socket(host, port)*.
-4. Cliente y servidor se comunican mediante flujos *InputStream* y *OutputStream*
-
-Pasos que se deben seguir:
-
-1. Apertura de sockets
-2. Creación de flujos (o Streams) de entrada
-3. Creación de flujos de salida
-4. Cierre de sockets
-
-[Ejemplo Arquitectura cliente - servidor simple que comparten mensajes vía TCP]()
+Antes de cada nueva transferencia en cualquiera de los modos, el cliente debe enviar otra vez un comando control, ya sea PORT o PASV.
 
 
-## Clases para Sockets UDP
-A través de este protocolo, los sockets son más simples y eficientes aunque como ya se ha visto, no está garantizada la entrega de los paquetes (ni el orden). Dado que no hay "conexión" entre emisor y receptor, esta información debe indicarse para cada paquete que se envíe. Como ya se ha comentado, cada paquete UDP se denomina datagrama y contiene:
+![alt-text](http://www.worldofintegration.com/sites/default/files/pictures_for_content/WOI_protocols/FTP_Passive.jpg "Esquema Modo Pasivo. Fuente: http://www.worldofintegration.com/sites/default/files/pictures_for_content/WOI_protocols/FTP_Passive.jpg")
 
-* Dirección IP de destino
-* Puerto de destino
-* Longitud del mensaje
-* Cuerpo del mensaje (bytes)
+#### Códigos de respuesta en FTP
 
-### DatagramPacket y DatagramSocket
-Estas clases pertenecientes a *java.net* modelan el envío y la creación de datagramas.
+FTP utiliza un esquema de códigos de respuesta donde cada dígito tiene un significado concreto. Son números en ASCII de tres dígitos (XYZ) y significan lo siguiente
 
-[*DatagramPacket*](https://docs.oracle.com/javase/7/docs/api/java/net/DatagramPacket.html) proporciona constructores para crear instancias de datagramas que se van a enviar y de los que van a ser recibidos. Vemos un ejemplo:
 
-```JAVA
-int puerto = 6543;
-InetAddress destino = InetAddress.getLocalHost(); // Obtenemos la IP del host local
+X: Indica si la respuesta es buena, mala o incompleta.
 
-// Para decir cualquier otro host
-// InetAddress destino = InetAddress.getByName("192.168.1.125");
+1 = Preliminar positiva 
+2 = Completamente positiva 
+3 = Positiva intermedia 
+4 = Negativa transiente 
+5 = Negativa permanente
 
-byte[] mensaje = new byte[1024];
+Y: especifica el tipo de respuesta:
 
-String saludo = "Hola UDP";
-mensaje = saludo.getBytes(); // Hay que pasar la cadena a bytes para el envío
+1 = Status de archivo o help 
+2 = Status de conexión 
+3 = Información de usuario 
+4 = No especificada 
+5 = Acción no tomada
 
-DatagramPacket paqueteUDP = new DatagramPacket(mensaje, mensaje.length, destino, puerto);
+Z: Mayor detalle sobre la respuesta, por ejemplo:
 
-```
+120   Servicio listo en nnn minutos (1XX) 
+200   comando OK (2XX) 
+230   User login correcto 
+331   Login de usuario correcto, necesita password (3XX) 
+425   No puede establecerse la conexión de datos (4XX) 
+500   Error de sintaxis, comando no reconocido (5XX)
 
-Mediante [*DatagramSocket*](https://docs.oracle.com/javase/7/docs/api/java/net/DatagramSocket.html) se puede generar el socket para enviar datagramas UDP. 
+[Listado Wikipedia EN](https://en.wikipedia.org/wiki/List_of_FTP_server_return_codes)
 
-```JAVA
 
-DatagramSocket socket = new DatagramSocket(34567);
-socket.send(paqueteUDP);
+### Cliente FTP en Java
 
-```
+Se modela básicamente mediante dos clases *[FTPClient](https://commons.apache.org/proper/commons-net/apidocs/org/apache/commons/net/ftp/FTPClient.html)* y *[FTPReply](https://commons.apache.org/proper/commons-net/apidocs/org/apache/commons/net/ftp/FTPReply.html)* ambas de la librería [Apache Commons Net](http://commons.apache.org/proper/commons-net/)
 
-Hasta ahora hemos visto como generar el paquete UDP y enviarlo. Para recibirlo, hace falta implementar el otro extremo de la comunicación. Para recibir, también se usa un *DatagramSocket*.
+Otra clase importante en la gestión de ficheros es *[FTPFile](https://commons.apache.org/proper/commons-net/apidocs/org/apache/commons/net/ftp/FTPFile.html)*
 
-```JAVA
-DatagramSocket socket = new DatagramSocket(12345);   
+Vemos ejemplos de código. 
 
-//ESPERANDO DATAGRAMA
-System.out.println("Esperando Datagrama .......... ");  
-DatagramPacket recibo = new DatagramPacket(bufer, bufer.length);
+[Ejemplo Descarga Carpeta](https://es.stackoverflow.com/questions/115650/descargar-una-carpeta-de-ftp-desde-java-usando-ftpclient-apache-commons-net)
 
-socket.receive(recibo);//recibo datagrama
 
-int bytesRec = recibo.getLength();//obtengo numero de bytes
-String paquete= new String(recibo.getData());//obtengo String
+## Protocolo SMTP
 
-//VISUALIZO INFORMACIÓN
-System.out.println("Número de Bytes recibidos: "+ bytesRec);    
-System.out.println("Contenido del Paquete    : "+ paquete.trim());
-System.out.println("Puerto origen del mensaje: "+ recibo.getPort());
-System.out.println("IP de origen             : "+ recibo.getAddress().getHostAddress());   
-System.out.println("Puerto destino del mensaje:" + socket.getLocalPort());	
-socket.close(); //cierro el socket
-```
+[SMTP (Simple Mail Transfer Protocol)](https://es.mailjet.com/blog/news/servidor-smtp/) es el protocolo habitual usado en Internet para el envío de correos electrónicos. 
 
-### Socket Multicast
+El funcionamiento del protocolo se produce mediante comandos de texto y el puerto habitualmente utilizado es el 25. El servidor responde a cada comando ejecutado por el cliente con un [código](https://www.greenend.org.uk/rjk/tech/smtpreplies.html) y un mensaje de respuesta. 
 
-Mediante la clase [*MulticastSocket*](https://docs.oracle.com/javase/7/docs/api/java/net/MulticastSocket.html) es posible enviar paquetes a varios destinatarios de forma simultánea. Para ello es necesario establecer en primer lugar el grupo de destinatarios, es decir, distintas direcciones ip pero con el mismo puerto. Dado que la creación del grupo de destinatarios es independiente del mensaje, puede decirse que los destinatarios son transparentes para el emisor (no conoce cuántos son ni sus direcciones).
+### Configuración del servidor
+[XAMPP](https://www.apachefriends.org/es/download.html) incorpora Mercury, y hay abundancia de [tutoriales](http://00l1.blogspot.com/2010/06/como-enviar-correos-desde-localhost-con.html) sobre la configuración del servidor en nuestro equipo local.
 
-Para definir el grupo multicast se utiliza una [dirección IP](https://es.wikipedia.org/wiki/Dirección_IP) de la clase D y un puerto UDP. El rango de las direcciones IP de clase D abarca de la 224.0.0.0 a la 239.255.255.255, si bien la primera no debe utilizarse.
+* Nota sobre el uso de servidores externos (Gmail, Outlook, etc): Si desde nuestro servidor se pretende utilizar una cuenta correspondiente a cualquiera de estos proveedores, se debe facultar en el perfil de usuario correspondiente el [acceso a aplicaciones menos seguras](https://support.google.com/a/answer/6260879?hl=es). Esto conviene hacerlo únicamente con propósitos de prueba y sería recomendable desactivarlo una vez concluidas las pruebas.
 
-Como ya se ha visto para definir los sockets UDP la misma clase que modela el objeto que envía el socket, modela el que los recibe. Vemos un ejemplo:
+Para probarlo una vez configurado, es posible probar el envío de emails mediante el [cliente Telnet, ejemplo](https://docs.microsoft.com/es-es/exchange/mail-flow/test-smtp-with-telnet?view=exchserver-2019) que incorpora Windows 10. En caso de no tener el cliente Telnet activado habrá que ir a la configuración de aplicaciones y activarlo.
+
+[otro ejemplo](http://amestoy.info/enviar-correo-via-smtp-utilizando-telnet/)
+
+
+#### Comandos básicos SMTP
+
+| COMANDO | Función |
+| ---------- | ---------- |
+| HELO o EHLO | Iniciar una sesión con el servidor. |
+|MAIL FROM |	Identificación del emisor. |
+|RCPT TO |	Identificación del destinatario.|
+|DATA	| Comienzo del mensaje.|
+|QUIT	| Finalización de la sesión.|
+|HELP	| Muestra la lista de comandos admitidos por el servidor.|
+
+Es posible consultar un listado más detallado de los [comandos SMTP](https://www.dsi.uclm.es/personal/miguelfgraciani/mikicurri/Docencia/LenguajesInternet0910/web_LI/Teoria/Protocolos%20de%20nivel%20de%20aplicacion/Material/Comandos%20del%20protocolo%20SMTP.htm)
+
+### Comunicación con el servidor SMTP mediante JAVA
+
+*Apache Commons Net* proporciona la clase ___[SMTPClient](https://commons.apache.org/proper/commons-net/apidocs/org/apache/commons/net/smtp/SMTPClient.html)___ que reune la funcionalidad necesaria para enviar ficheros a través de un servidor SMTP. De forma análoga a otras clases derivadas de _SocketClient_, la clase __[SMTP](https://commons.apache.org/proper/commons-net/apidocs/org/apache/commons/net/smtp/SMTP.html)__ lo es, es necesario establecer conexión con el servidor antes de lanzar cualquier otra operación y es preciso desconectarse al terminarlas. 
+
+Una vez establecida la conexión al servidor, la clase ___[SMTPReply](https://commons.apache.org/proper/commons-net/apidocs/org/apache/commons/net/smtp/SMTPReply.html)___ recoge diversas constantes sobre los códigos de respuesta SMTP, aunque es conveniente poder consultar el listado completo ya visto previamente.
+
+A continuación, se muestra un ejemplo de cliente para enviar un mensaje simple de correo:
 
 ```java
-public class MulticastEmisor {
-    private DatagramSocket socket;
-    private InetAddress grupo;
-    private byte[] buf;
- 
-    public void multicast(
-      String multicastMessage) throws IOException {
-        socket = new DatagramSocket();
-        grupo = InetAddress.getByName("230.0.0.0");
-        buf = multicastMessage.getBytes();
- 
-        DatagramPacket informacion = new DatagramPacket(buf, buf.length, grupo, 4446);
-        socket.send(informacion);
-        socket.close();
-    }
-}
+import java.io.IOException;
+import java.net.ConnectException;
 
-// Cliente que escucha hasta que llega la cadena fin.
-public class MulticastReceptor extends Thread {
-    protected MulticastSocket socket = null;
-    protected byte[] buf = new byte[256];
- 
-    public void run() {
-        
-        socket = new MulticastSocket(4446);
-        InetAddress grupoMulticast = InetAddress.getByName("230.0.0.0");
-        socket.joinGroup(grupoMulticast);
-        
-        while (true) {
-            
-            DatagramPacket informacion = new DatagramPacket(buf, buf.length);
-            socket.receive(informacion);
-            String recibido = new String(informacion.getData(), 0, informacion.getLength());
-            System.out.println(recibido);
-            
-            if ("fin".equals(recibido)) {
-                break;
-            }
-        }
-        socket.leaveGroup(grupoMulticast);
-        socket.close();
-    }
+import org.apache.commons.net.smtp.AuthenticatingSMTPClient;
+import org.apache.commons.net.smtp.SMTPClient;
+import org.apache.commons.net.smtp.SMTPReply;
+
+public class EnviarMensaje {
+
+	public static void main(String[] args) {
+		SMTPClient client = new SMTPClient();
+		try {
+			int respuesta;
+			client.connect("localhost");
+			System.out.print(client.getReplyString());
+			respuesta = client.getReplyCode();
+
+			if (!SMTPReply.isPositiveCompletion(respuesta)) {
+				client.disconnect();
+				System.err.println("Conexión rechazada por el servidor.");
+				System.exit(1);
+			}
+
+			client.login(); // inicio de sesión HELO
+			String destinatario = "gomezmorata@iestubalcain.net";
+			String mensaje = "Hola. \nEste mensaje se envía desde un cliente Java\n";
+			String remitente = "alumno@localhost.es";
+
+			if (client.sendSimpleMessage(remitente, destinatario, mensaje))
+				System.out.println("El mensaje se ha enviado a " + destinatario);
+			else
+				System.out.println("El mensaje no se ha podido enviar");
+
+			// final de sesión QUIT
+			client.logout();
+
+			client.disconnect();
+
+		}catch(ConnectException ce){
+			System.err.println("Servidor NO iniciado");			
+			System.err.println(ce.getMessage());
+			System.exit(2);
+		}
+		catch (IOException e) {
+			System.err.println("No se ha podido conectar al servidor");
+			e.printStackTrace();
+			System.exit(2);
+		}
+
+	}
 }
 ```
-Como se ve el proceso es bastante sencillo, implica los siguientes pasos por parte del emisor:
+Si se usa el servidor Mercury incluido en el XAMPP es conveniente consultar los mensajes que va devolviendo el servidor SMTP. Si se produce un error de HELO incorrecto (SMTP 554), puede solucionarse de la siguiente manera:
 
-1. Creación del socket y grupo (señalar la IP multicast a utilizar).
-2. Construir el mensaje
-3. Envío
-4. Cierre del socket.
+*In mercury logs, you will see this message ""554 Invalid HELO format" on valid HELOs/EHLO".
+It is due to the RFC compliance from mercury which isn't RFC compliant.
+Here is the fix :
+locate "transfltr.mer" in mercury folder, edit it with notepad or whatever.
+Locate this line at the end of the file :
+H, "[EHeh][EHeh]LO +[0-9]+.[0-9]+.[0-9]+.[0-9]", R, "554 Invalid HELO format"
+comment it out (add # at the begining of the line) restart the mail server then.
+If you want to turn mercury into RFC compliant, add this line above the one you commented out :
+H, "[EHeh][EHeh]LO +[0-9]+.[0-9]+.[0-9]+.[0-9]+.", X, ""*
 
-Por su parte el receptor debe:
 
-1. Crear el socket y unirse al grupo multicast
-2. Escuchar los mensajes
-3. Abandonar el grupo si se desea
-4. Cierre del socket.
-
-## Envío de objetos mediante sockets
-
-A la hora de llevar a cabo el envío de otro tipo de información distinta de las cadenas de caracteres o números hay que conocer las clases que modelan el envío de objetos a través de sockets. En función del protocolo a utilizar se emplearán unas clases u otras.
-
-### Envío de objetos mediante sockets basados en TCP
-
-Como ya se ha visto para cadenas, hay que construir *streams* o flujos que contendrán la información a enviar. Cuando se trata de objetos, este comportamiento se modela mediante las clases [*ObjectInputStream*](https://docs.oracle.com/javase/7/docs/api/java/io/ObjectInputStream.html) y [*ObjectOutputStream*](https://docs.oracle.com/javase/7/docs/api/java/io/ObjectOutputStream.html)
+La clase __[SimpleSMTPHeader](https://commons.apache.org/proper/commons-net/apidocs/org/apache/commons/net/smtp/SimpleSMTPHeader.html)__ modela la construcción de la cabecera para el envío de emails. 
 
 ```java
-public class TCPObjetoServidor1 {
-  public static void main(String[] arg) throws IOException,
-						ClassNotFoundException {
-   int numeroPuerto = 6543;// Puerto local para el envío
-   ServerSocket servidor =  new ServerSocket(numeroPuerto);
-   System.out.println("Esperando al cliente.....");   
-   Socket cliente = servidor.accept();
-	
-   //flujo de salida para objetos 		
-   ObjectOutputStream objSalida = new ObjectOutputStream(cliente.getOutputStream()); 	
-   
-   // Se prepara un objeto y se envía 
-   PersonaModel persona = new PersonaModel("Pedro", 43);
-   objSalida.writeObject(persona); //enviando objeto
-   System.out.println("Envio: " + persona.getNombre() +", "+ persona.getEdad());  
+import java.io.IOException;
+import java.io.Writer;
+import java.security.NoSuchAlgorithmException;
 
-   
-   // Se obtiene un stream para leer objetos
-   ObjectInputStream objetoEntrada = new ObjectInputStream(cliente.getInputStream());
-   PersonaModel dato = (PersonaModel) objetoEntrada.readObject();
-   System.out.println("Recibo: "+dato.getNombre()+", "+dato.getEdad());
-		
-   // CERRAR STREAMS Y SOCKETS
-   objSalida.close();
-   objetoEntrada.close();
-   cliente.close();
-   servidor.close();
-  }
-}
+import org.apache.commons.net.smtp.AuthenticatingSMTPClient;
+import org.apache.commons.net.smtp.SMTPClient;
+import org.apache.commons.net.smtp.SMTPReply;
+import org.apache.commons.net.smtp.SMTPSClient;
+import org.apache.commons.net.smtp.SimpleSMTPHeader;
 
-/*
+public class ClienteSMTPConHeaders {
 
-	* Importante crear en los dos lados los flujos de entrada y salida. Primero se crea el de salida y luego el de entrada.
-	* Ver Javadoc object stream header
-	* El modelo que se use como objeto a intercambiar debe ser serializable (implementar dicho interface)
+	public static void main(String[] args)  {
+		SMTPClient client= new SMTPClient();
+		 try {
+		      int respuesta;
+		      client.connect("localhost");
+		      System.out.print(client.getReplyString());
+		      respuesta = client.getReplyCode();
 
-*/
-
-public class TCPObjetoCliente1 {
-  public static void main(String[] arg) throws IOException,ClassNotFoundException {
-    
-    String Host = "localhost";
-    int Puerto = 6543;//puerto del servidor	
-		
-    System.out.println("PROGRAMA CLIENTE INICIADO....");
-    Socket cliente = new Socket(Host, Puerto);	
-	
-    //Flujo de entrada
-    ObjectInputStream objEntrada = new ObjectInputStream(cliente.getInputStream());
-    
-    //Se recibe un objeto
-    PersonaModel personaRec = (PersonaModel) objEntrada.readObject();//recibo objeto
-    System.out.println("Recibo: " personaRec.getNombre()+"*" personaRec.getEdad());
-	
-    //Modifico el objeto
-    personaRec.setNombre("Pepito Perez");
-    personaRec.setEdad(55);
-	
-    //Flujo de salida
-    ObjectOutputStream objSalida = new ObjectOutputStream(cliente.getOutputStream());
-    
-    // Se envía el objeto
-    objSalida.writeObject(personaRec);
-    System.out.println("Envio: " personaRec.getNombre()+", " personaRec.getEdad());                       
-		
-    // CERRAR STREAMS Y SOCKETS
-    objEntrada.close();
-    objSalida.close();
-    cliente.close();		
-  }
+		      if(!SMTPReply.isPositiveCompletion(respuesta)) {
+		        client.disconnect();
+		        System.err.println("SMTP server refused connection.");
+		        System.exit(1);
+		      }
+		      
+		      client.login();
+		    
+		      String remitente ="remitente@localhost.es";
+		      String destino1="fulanito@iestubalcain.net";
+		      String destino2="menganito@iestubalcain.net";		      
+		      String asunto="Prueba de SMTPClient con Headers";
+		      String mensaje = "Hola. \nEnviando prueba desde cliente Java con Headers\n";
+		      
+		      //se crea la cabecera
+		      SimpleSMTPHeader cabecera = new SimpleSMTPHeader
+		    		  (remitente , destino1, asunto);		      
+		      cabecera.addCC(destino2);
+		      
+		      //establecer el correo de origen
+		      client.setSender(remitente);
+		      
+		      //añadir correos destino 
+		      client.addRecipient(destino1);//hay que añadir los dos
+		      client.addRecipient(destino2);
+		     
+		      //se envia DATA al servidor
+		      Writer writer = client.sendMessageData();   
+		      if(writer == null) { //fallo	       
+		    	  System.out.println("Fallo al enviar DATA.");			     
+			      System.exit(1);
+		      }
+		      
+		      System.out.println(cabecera.toString());
+		      writer.write(cabecera.toString()); //primero escribo cabecera    
+	          writer.write(mensaje);//luego mensaje
+	          writer.close();
+	          
+	       	  if(!client.completePendingCommand())  { //fallo
+	       		  System.out.println("Fallo al finalizar la transacción.");			     
+			      System.exit(1);
+		      }
+		      
+	       	  client.logout(); 
+	          client.disconnect();
+	          
+		    } catch (IOException e) {
+				System.err.println("No se puede conectar al servidor.");
+				e.printStackTrace();
+				System.exit(2);
+			}
+		    
+		    System.exit(0);
+		}
 }
 ```
+#### Mecanismos de autenticación
 
-### Envío de objetos mediante sockets basados en UDP
+La autenticación en el protocolo SMTP tiene como objetivo el aumento de los niveles de seguridad. De forma más general, busca evitar el uso de una dirección de correo de forma no autorizada. Se modela mediante la clase __[AuthenticatingSMTPClient](https://commons.apache.org/proper/commons-net/apidocs/org/apache/commons/net/smtp/AuthenticatingSMTPClient.html)__, que extiende a __[SMTPSClient](https://commons.apache.org/proper/commons-net/apidocs/org/apache/commons/net/smtp/SMTPSClient.html)__. Cuando se usa este protocolo, los puertos pueden cambiar: 465, 587 se dan con frecuencia en lugar del 25 de STMP.
 
-Para poder hacer el intercambio de objetos Java mediante sockets UDP se pueden utilizar las clases [ByteArrayOutputStream](https://docs.oracle.com/javase/7/docs/api/java/io/ByteArrayOutputStream.html) y [ByteArrayInputStream](https://docs.oracle.com/javase/7/docs/api/java/io/ByteArrayInputStream.html). Como se supondrá, el objeto debe convertirse en un array de bytes.
+A grandes rasgos, el empleo de estas clases supone la implementación de SMTP sobre SSL (Secure Socket Layer). TLS (Transport Layer Security) trabaja al nivel de la capa de transporte y supone una mejora sobre el SSL.
 
-```java 
-Persona persona = new Persona("Juan", 25);
+El comando __[STARTTLS](https://es.wikipedia.org/wiki/STARTTLS)__ busca incorporar un mayor nivel de privacidad al envío de emails. Establece el cifrado de las comunicaciones entre cliente y servidor. 
 
-// OBJETO A BYTES
-ByteArrayOutputStream baos = new ByteArrayOutputStream();
-ObjectOutputStream out = new ObjectOutputStream(baos);
-
-out.writeObject(persona); //Se escribe el objeto persona en el stream
-
-out.close(); // Se cierra el stream
-
-byte[] bytes = baos.toByteArray(); // se toma  el objeto transformado en bytes
-
-/* 
- * En cambio, para los datos recibidos (bytes) por el datagrama en un objeto Persona habría que hacer lo siguiente:
-*/
-
-// BYTES A OBJETO
-byte[] recibido = new byte[1024];
-DatagramPacket paqRecibido = new DatagramPacket(recibido, recibido.length);
-socket.receive(paqRecibido);
-
-//Pasamos bytes a objeto
-ByteArrayInputStream bais = new ByteArrayInputStream(recibido);
-ObjectInputStream in = new ObjectInputStream(bais);
-Persona persona = (Persona)in.readObject(); //Se obtiene el objeto recibido como bytes
-in.close();
-```
+Mediante STMPSClient se pueden definir dos modos de seguridad; __explícito__ e __implícito__. En este último, la negociación SSL/TLS tiene comienzo cuando ya se ha establecido la conexión. Por el contrario, en el explícito, la negociación se inicia al llamar al método __execTLS()__ y que el servidor acepte dicho comando.
 
 
-## Gestión de clientes múltiples (threads)
-
-Cuando se necesita que un servidor pueda atender a más de un cliente de forma simultánea, se impone la necesidad de la programación *multihilo* de manera que cada cliente pueda ser atendido por un hilo. 
-
-En TCP, la filosofía básica es crear un servidor común que acepte las peticiones de los clientes, pero de forma que cada una de ellas sea gestionada por un _hilo_ diferente. 
+La autenticación SMTP puede darse de varias formas, gestionadas por la clase ya vista, __AuthenticatingSMTPClient__, que permite al cliente iniciar sesión mediante alguno de los métodos de autenticación que soporte el servidor. Tiene varios constructores para acomodarse a distintos protocolos o codificaciones. Los métodos más relevantes son __auth__ y __ehlo__ que envían los mensajes AUTH (con el método y los valores de usuario/password) y EHLO al servidor (con el nombre del servidor), respectivamente.
 
 ```java
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.io.Writer;
+import java.security.InvalidKeyException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.spec.InvalidKeySpecException;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import org.apache.commons.net.smtp.*;
 
-public class Servidor {
-  public static void main(String args[]) throws IOException  {
-    ServerSocket servidor;    
-    servidor = new ServerSocket(6000);
-    
-    while (true) {  
-      Socket cliente = new Socket();
-      cliente=servidor.accept();//esperando cliente 
-      HiloServidor hilo = new HiloServidor(cliente);
-      hilo.start();   
-    }
-  }
+public class ClienteSMTPAutenticado {
+	public static void main(String[] args) throws NoSuchAlgorithmException, UnrecoverableKeyException,
+			KeyStoreException, InvalidKeyException, InvalidKeySpecException {
+
+		// se crea cliente SMTP seguro
+		AuthenticatingSMTPClient client = new AuthenticatingSMTPClient();
+
+		// datos del usuario y del servidor
+		String server = "smtp.gmail.com";
+		String username = "correo@gmail.com";
+		String password = "claveusuario";
+		int puerto = 587;
+		String remitente = "correo@gmail.com";
+
+		try {
+			int respuesta;
+
+			// Se crea la clave para establecer un canal seguro
+			KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+			kmf.init(null, null);
+			KeyManager km = kmf.getKeyManagers()[0];
+
+			// Conexión al servidor SMTP
+			client.connect(server, puerto);
+			System.out.println("1 - " + client.getReplyString());
+			
+			// Establecimiento de la clave para la comunicación segura
+			client.setKeyManager(km);
+
+			respuesta = client.getReplyCode();
+			if (!SMTPReply.isPositiveCompletion(respuesta)) {
+				client.disconnect();
+				System.err.println("Conexión rechazada.");
+				System.exit(1);
+			}
+
+			// se envía el commando EHLO
+			client.ehlo(server);
+			System.out.println("2 - " + client.getReplyString());
+
+			// Necesita negociación TLS - MODO NO IMPLICITO
+			
+			// Se ejecuta el comando STARTTLS y se comprueba si es true
+			if (client.execTLS()) {
+				System.out.println("3 - " + client.getReplyString());
+
+				// se realiza la autenticación con el servidor
+				if (client.auth(AuthenticatingSMTPClient.AUTH_METHOD.LOGIN, username, password)) {
+					System.out.println("4 - " + client.getReplyString());
+					String destino1 = "fulanito@gmail.com";
+					String asunto = "Prueba de SMTPClient con Gmail";
+					String mensaje = "Esto es una prueba de mensaje con usuario autenticado desde Java.";
+					// se crea la cabecera
+					SimpleSMTPHeader cabecera = new SimpleSMTPHeader(remitente, destino1, asunto);
+
+					// el nombre de usuario y el email de origen coinciden
+					client.setSender(remitente);
+					client.addRecipient(destino1);
+					System.out.println("5 - " + client.getReplyString());
+
+					// se envia DATA
+					Writer writer = client.sendMessageData();
+					if (writer == null) { // fallo
+						System.out.println("Fallo al enviar DATA.");
+						System.exit(1);
+					}
+
+					writer.write(cabecera.toString()); // cabecera
+					writer.write(mensaje);// luego mensaje
+					writer.close();
+					System.out.println("6 - " + client.getReplyString());
+
+					boolean exito = client.completePendingCommand();
+					System.out.println("7 - " + client.getReplyString());
+
+					if (!exito) { // fallo
+						System.out.println("Fallo al finalizar transacción.");
+						System.exit(1);
+					} else
+						System.out.println("Mensaje enviado con exito......");
+
+				} else
+					System.out.println("USUARIO NO AUTENTICADO.");
+			} else
+				System.out.println("FALLO AL EJECUTAR  STARTTLS.");
+
+		} catch (IOException e) {
+			System.err.println("Could not connect to server.");
+			e.printStackTrace();
+			System.exit(1);
+		}
+		try {
+			client.disconnect();
+		} catch (IOException f) {
+			f.printStackTrace();
+		}
+
+		System.out.println("Fin del envío.");
+		System.exit(0);
+	}
 }
 ```
 
-En este caso por ejemplo, el cliente envía una cadena al servidor que éste devuelve en mayúsculas hasta que reciba un asterisco (que finaliza la conexión con el cliente). En la clase _HiloServidor_ se hace la gestión de cada cliente.
+
+### Otros protocolos involucrados en el envío/acceso a emails
+
+* Protocolo de Oficina de Correo [POP](https://es.wikipedia.org/wiki/Protocolo_de_oficina_de_correo). La versión actual es la 3 y habitualmente se suele referir a dicho protocolo exclusivamente en referencia a dicha versión como POP3. Las clases Java que modelan el acceso a un servidor POP3 están incluidas en Apache Commons Net y son:
+
+	* [POP3Client](https://commons.apache.org/proper/commons-net/apidocs/org/apache/commons/net/pop3/POP3Client.html). De forma a análoga a SMTPClient, implementa el lado cliente de POP3
+	* [POP3SClient](https://commons.apache.org/proper/commons-net/apidocs/org/apache/commons/net/pop3/POP3SClient.html). Versión con soporte SSL de la clase anterior
+	* [POP3MessageInfo](https://commons.apache.org/proper/commons-net/apidocs/org/apache/commons/net/pop3/POP3MessageInfo.html). Modela la obtención de información de los mensajes presentes en el servidor POP3
 
 
-```java 
-import java.io.*;
-import java.net.*;
+##### Comandos POP3
 
-public class Servidor {
-    public static void main(String args[]) throws IOException  {
-        ServerSocket servidor;      
-        servidor = new ServerSocket(6000);
-        System.out.println("Servidor iniciado...");
-        
-        while (true) {  
-            Socket cliente = new Socket();
-            cliente=servidor.accept();//esperando cliente   
-            HiloServidor hilo = new HiloServidor(cliente);
-            hilo.start();       
-        }
-    }
-}
-```
-Las operaciones de un cliente concreto se gestionan por el hilo, lo que permite que el servidor se mantenga a la escucha y no interrumpa su proceso mientras que los clientes ven resueltas sus peticiones. Vemos un algoritmo en el que el servidor devolverá la cadena recibida pero en mayúsculas hasta que reciba un asterisco.
 
-```java
-import java.io.*;
-import java.net.*;
+| Comando	| Descripción |
+|-----------|-------------|
+| USER | identification	Este comando permite la autenticación. Debe estar seguido del nombre de usuario, es decir, una cadena de caracteres que identifique al usuario en el servidor. El comando USER debe preceder al comando password
+| PASS | El comando PASS permite especificar la contraseña del usuario cuyo nombre ha sido especificado por un comando USER previo. |
+| STAT	| Información acerca de los mensajes del servidor |
+| RETR num |	Número del mensaje a recuperar |
+| DELE num |	Número del mensaje a eliminar |
+| LIST [msg] |	Número del mensaje a mostrar |
+|NOOP |	Permite mantener la conexión abierta en caso de inactividad |
+|TOP <messageID> <n>	| Comando que muestra n líneas del mensaje, cuyo número se da en el argumento. En el caso de una respuesta positiva del servidor, éste enviará de vuelta los encabezados del mensaje, después una línea en blanco y finalmente las primeras n líneas del mensaje |
+|UIDL [msg] |	Solicitud al servidor para que envíe una línea que contenga información sobre el mensaje que eventualmente se dará en el argumento. Esta línea contiene una cadena de caracteres denominada unique identifier listing (lista de identificadores únicos) que permite identificar de manera única el mensaje en el servidor, independientemente de la sesión. El argumento opcional es un número relacionado con un mensaje existente en el servidor POP, es decir, un mensaje que no se ha borrado|
+| QUIT | El comando QUIT solicita la salida del servidor POP3. Lleva a la eliminación de todos los mensajes marcados como eliminados y envía el esta acción. |
 
-public class HiloServidor extends Thread {
-  BufferedReader fentrada;
-  PrintWriter fsalida;
-  Socket socket = null;
+* Internet Message Access Protocol [IMAP](https://es.wikipedia.org/wiki/Protocolo_de_acceso_a_mensajes_de_Internet). Más moderno que POP3. Actualmente en la versión 4. Almacena los mensajes en el servidor (POP3 no).
 
-  public HiloServidor(Socket s) throws IOException {// CONSTRUCTOR
-    socket = s;
-    // se crean flujos de entrada y salida
-    fsalida = new PrintWriter(socket.getOutputStream(), true);
-    fentrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-  }
+	* [IMAPClient](http://commons.apache.org/proper/commons-net/apidocs/org/apache/commons/net/imap/IMAPClient.html)
+	* [IMAPSClient](http://commons.apache.org/proper/commons-net/apidocs/org/apache/commons/net/imap/IMAPSClient.html)
 
-  public void run() {// tarea a realizar con el cliente
-    String cadena = "";
+* Multipurpose Internet Mail Extensions [MIME](https://es.wikipedia.org/wiki/Multipurpose_Internet_Mail_Extensions)
 
-    System.out.println("COMUNICO CON: " + socket.toString());
-
-    while (!cadena.trim().equals("*")) {
-
-      try {
-        cadena = fentrada.readLine();
-      } catch (IOException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      } // obtener cadena
-      fsalida.println(cadena.trim().toUpperCase());// enviar mayúscula
-    } // fin while
-
-    System.out.println("FIN CON: " + socket.toString());
-
-    fsalida.close();
-    try {
-      fentrada.close();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    try {
-      socket.close();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-  }
-}
-```
-
-Para el cliente, podria servir alguno de los ya vistos en las secciones previas. Por ejemplo el siguiente:
-
-```java
-public class Cliente {
-  public static void main(String[] args) throws IOException {
-    String Host = "localhost";
-    int Puerto = 6000;// puerto remoto
-    Socket Cliente = new Socket(Host, Puerto);
-        
-    // CREO FLUJO DE SALIDA AL SERVIDOR 
-    PrintWriter fsalida = new PrintWriter (Cliente.getOutputStream(), true);
-    // CREO FLUJO DE ENTRADA AL SERVIDOR    
-    BufferedReader fentrada =  new BufferedReader
-         (new InputStreamReader(Cliente.getInputStream()));
-         
-    // FLUJO PARA ENTRADA ESTANDAR
-    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-    String cadena, eco="";
-        
-    
-    do{ 
-        System.out.print("Introduce cadena: ");
-        cadena = in.readLine();
-        fsalida.println(cadena);
-        eco=fentrada.readLine();            
-        System.out.println("  =>ECO: "+eco);    
-    } while(!cadena.trim().equals("*"));
-        
-    fsalida.close();
-    fentrada.close();
-    System.out.println("Fin del envío... ");
-    in.close();
-    Cliente.close();
-    }
-}
-```
+## Servidores Java
